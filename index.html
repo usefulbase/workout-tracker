@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>筋トレ管理アプリ</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>筋トレ管理</h1>
+    <p>ChatGPTで決めた予定と、実際の記録を管理できます</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>今日の予定</h2>
+      <textarea id="planInput" placeholder="ChatGPTで決めたメニューを貼り付け"></textarea>
+      <button onclick="savePlan()">予定を保存</button>
+    </section>
+
+    <section class="card">
+      <h2>今日の実績</h2>
+      <textarea id="resultInput" placeholder="実際にやった内容を入力"></textarea>
+      <button onclick="saveResult()">実績を保存</button>
+    </section>
+
+    <section class="card">
+      <h2>予定と実績の比較</h2>
+      <div id="compareArea" class="table-wrap"></div>
+    </section>
+
+    <section class="card">
+      <h2>前回の実績</h2>
+      <div id="lastResultArea"></div>
+    </section>
+
+    <section class="card">
+      <h2>ChatGPT相談用コピー</h2>
+      <button onclick="copyForChatGPT()">相談文をコピー</button>
+      <textarea id="chatgptCopy" readonly></textarea>
+    </section>
+
+    <section class="card danger">
+      <h2>データ管理</h2>
+      <button onclick="clearAllData()">全データ削除</button>
+    </section>
+  </main>
+</body>
+</html>
