@@ -3,43 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>筋トレ管理アプリ</title>
+  <title>Workout Tracker</title>
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 </head>
 <body>
   <header>
-    <h1>筋トレ管理</h1>
-    <p>ChatGPTで決めた予定と、実際の記録を管理できます</p>
+    <h1>Workout Tracker</h1>
+    <p>予定メモ・実績入力・前回実績・履歴管理</p>
   </header>
 
   <main>
     <section class="card">
-      <h2>今日の予定</h2>
-      <textarea id="planInput" placeholder="ChatGPTで決めたメニューを貼り付け"></textarea>
-      <button onclick="savePlan()">予定を保存</button>
+      <h2>今日の予定メモ</h2>
+      <textarea id="planInput" placeholder="例：
+5/23予定
+トレッドミル 0×4.5×10
+レッグプレス50×12×2
+チェストプレス25×10×2"></textarea>
+      <button onclick="savePlan()">予定メモを保存</button>
+      <div id="todayPlanArea"></div>
     </section>
 
     <section class="card">
-      <h2>今日の実績</h2>
-      <textarea id="resultInput" placeholder="実際にやった内容を入力"></textarea>
-      <button onclick="saveResult()">実績を保存</button>
+      <h2>今日の実績入力</h2>
+
+      <label>日付</label>
+      <input type="date" id="workoutDate" />
+
+      <label>種目</label>
+      <select id="exerciseName">
+        <option value="トレッドミル">トレッドミル</option>
+        <option value="レッグプレス">レッグプレス</option>
+        <option value="チェストプレス">チェストプレス</option>
+        <option value="ラットプルダウン">ラットプルダウン</option>
+        <option value="アブダクション">アブダクション</option>
+        <option value="アダクション">アダクション</option>
+        <option value="その他">その他</option>
+      </select>
+
+      <input type="text" id="customExerciseName" placeholder="その他の種目名" class="hidden" />
+
+      <div class="input-grid">
+        <div>
+          <label>重量・傾斜</label>
+          <input type="number" id="weightInput" inputmode="decimal" step="0.5" placeholder="例 50" />
+        </div>
+        <div>
+          <label>回数・速度</label>
+          <input type="number" id="repsInput" inputmode="decimal" step="0.1" placeholder="例 12" />
+        </div>
+        <div>
+          <label>セット・分</label>
+          <input type="number" id="setsInput" inputmode="numeric" step="1" placeholder="例 2" />
+        </div>
+      </div>
+
+      <button onclick="addExercise()">実績に追加</button>
+
+      <div id="currentWorkoutArea"></div>
+
+      <button class="save-btn" onclick="saveWorkout()">今日の実績を保存</button>
     </section>
 
     <section class="card">
-      <h2>予定と実績の比較</h2>
-      <div id="compareArea" class="table-wrap"></div>
+      <h2>直近の前回実績</h2>
+      <div id="lastWorkoutArea"></div>
     </section>
 
     <section class="card">
-      <h2>前回の実績</h2>
-      <div id="lastResultArea"></div>
-    </section>
-
-    <section class="card">
-      <h2>ChatGPT相談用コピー</h2>
-      <button onclick="copyForChatGPT()">相談文をコピー</button>
-      <textarea id="chatgptCopy" readonly></textarea>
+      <h2>履歴</h2>
+      <div id="historyArea"></div>
     </section>
 
     <section class="card danger">
