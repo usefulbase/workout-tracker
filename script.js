@@ -1,254 +1,262 @@
 let plans = JSON.parse(localStorage.getItem("plans")) || [];
-let results = JSON.parse(localStorage.getItem("results")) || [];
+let workouts = JSON.parse(localStorage.getItem("workouts")) || [];
+let currentExercises = [];
 
 window.addEventListener("DOMContentLoaded", () => {
+  setTodayDate();
+  setupExerciseSelect();
   renderAll();
 });
 
+function setTodayDate() {
+  const dateInput = document.getElementById("workoutDate");
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  dateInput.value = `${yyyy}-${mm}-${dd}`;
+}
+
+function setupExerciseSelect() {
+  const select = document.getElementById("exerciseName");
+  const custom = document.getElementById("customExerciseName");
+
+  select.addEventListener("change", () => {
+    if (select.value === "その他") {
+      custom.classList.remove("hidden");
+    } else {
+      custom.classList.add("hidden");
+      custom.value = "";
+    }
+  });
+}
+
 function savePlan() {
   const text = document.getElementById("planInput").value.trim();
-  if (!text) return alert("予定を入力してください");
 
-  const parsed = parseWorkoutText(text);
+  if (!text) {
+    alert("予定メモを入力してください");
+    return;
+  }
 
   plans.push({
-    date: parsed.date,
+    date: getDisplayDate(),
     raw: text,
-    exercises: parsed.exercises,
     createdAt: new Date().toISOString()
   });
 
   localStorage.setItem("plans", JSON.stringify(plans));
-  renderAll();
-  alert("予定を保存しました");
+  document.getElementById("planInput").value = "";
+  renderTodayPlan();
+
+  alert("予定メモを保存しました");
 }
 
-function saveResult() {
-  const text = document.getElementById("resultInput").value.trim();
-  if (!text) return alert("実績を入力してください");
+function addExercise() {
+  const select = document.getElementById("exerciseName");
+  const custom = document.getElementById("customExerciseName");
 
-  const parsed = parseWorkoutText(text);
+  const name = select.value === "その他"
+    ? custom.value.trim()
+    : select.value;
 
-  results.push({
-    date: parsed.date,
-    raw: text,
-    exercises: parsed.exercises,
-    createdAt: new Date().toISOString()
-  });
+  const weight = document.getElementById("weightInput").value;
+  const reps = document.getElementById("repsInput").value;
+  const sets = document.getElementById("setsInput").value;
 
-  localStorage.setItem("results", JSON.stringify(results));
-  renderAll();
-  alert("実績を保存しました");
-}
-
-function parseWorkoutText(text) {
-  const lines = text.split("\n").map(line => line.trim()).filter(Boolean);
-  let date = lines[0] || "日付不明";
-  date = date.replace("予定", "").trim();
-
-  const exercises = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-
-    const match = line.match(/^(.+?)(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)×(\d+)$/);
-
-    if (match) {
-      exercises.push({
-        name: match[1].trim(),
-        weight: Number(match[2]),
-        reps: Number(match[3]),
-        sets: Number(match[4]),
-        raw: line
-      });
-    }
-  }
-
-  return { date, exercises };
-}
-
-function renderAll() {
-  renderCompare();
-  renderLastResult();
-  makeChatGPTText();
-}
-
-function getLatestPlan() {
-  return plans[plans.length - 1] || null;
-}
-
-function getLatestResult() {
-  return results[results.length - 1] || null;
-}
-
-function getPreviousResult() {
-  if (results.length < 2) return null;
-  return results[results.length - 2];
-}
-
-function renderCompare() {
-  const area = document.getElementById("compareArea");
-  const plan = getLatestPlan();
-  const result = getLatestResult();
-
-  if (!plan || !result) {
-    area.innerHTML = "<p>予定と実績を保存すると比較できます。</p>";
+  if (!name) {
+    alert("種目名を入力してください");
     return;
   }
 
-  const rows = [];
-
-  plan.exercises.forEach(planEx => {
-    const matched = result.exercises.filter(r => r.name === planEx.name);
-
-    if (matched.length === 0) {
-      rows.push({
-        name: planEx.name,
-        plan: formatExercise(planEx),
-        result: "なし",
-        status: "未実施",
-        className: "less"
-      });
-      return;
-    }
-
-    const planVolume = volume(planEx);
-    const resultVolume = matched.reduce((sum, ex) => sum + volume(ex), 0);
-
-    let status = "達成";
-    let className = "ok";
-
-    if (resultVolume > planVolume) {
-      status = "予定以上";
-      className = "more";
-    } else if (resultVolume < planVolume) {
-      status = "少し不足";
-      className = "less";
-    }
-
-    rows.push({
-      name: planEx.name,
-      plan: formatExercise(planEx),
-      result: matched.map(formatExercise).join(" / "),
-      status,
-      className
-    });
-  });
-
-  const extraExercises = result.exercises.filter(resultEx => {
-    return !plan.exercises.some(planEx => planEx.name === resultEx.name);
-  });
-
-  extraExercises.forEach(ex => {
-    rows.push({
-      name: ex.name,
-      plan: "予定なし",
-      result: formatExercise(ex),
-      status: "追加",
-      className: "more"
-    });
-  });
-
-  area.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>種目</th>
-          <th>予定</th>
-          <th>実績</th>
-          <th>判定</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.map(row => `
-          <tr>
-            <td>${row.name}</td>
-            <td>${row.plan}</td>
-            <td>${row.result}</td>
-            <td><span class="badge ${row.className}">${row.status}</span></td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
-  `;
-}
-
-function renderLastResult() {
-  const area = document.getElementById("lastResultArea");
-  const last = getLatestResult();
-
-  if (!last) {
-    area.innerHTML = "<p>まだ実績がありません。</p>";
+  if (weight === "" || reps === "" || sets === "") {
+    alert("重量・回数・セットを入力してください");
     return;
   }
 
-  const grouped = {};
-
-  last.exercises.forEach(ex => {
-    if (!grouped[ex.name]) grouped[ex.name] = [];
-    grouped[ex.name].push(ex);
+  currentExercises.push({
+    name,
+    weight: Number(weight),
+    reps: Number(reps),
+    sets: Number(sets)
   });
 
+  clearExerciseInputs();
+  renderCurrentWorkout();
+}
+
+function clearExerciseInputs() {
+  document.getElementById("weightInput").value = "";
+  document.getElementById("repsInput").value = "";
+  document.getElementById("setsInput").value = "";
+}
+
+function renderCurrentWorkout() {
+  const area = document.getElementById("currentWorkoutArea");
+
+  if (currentExercises.length === 0) {
+    area.innerHTML = `<p class="empty">まだ実績が追加されていません。</p>`;
+    return;
+  }
+
   area.innerHTML = `
-    <p><strong>${last.date}</strong></p>
-    ${Object.keys(grouped).map(name => `
-      <div class="log-item">
-        <strong>${name}</strong><br>
-        ${grouped[name].map(formatExercise).join(" / ")}
+    <div class="date-title">入力中の実績</div>
+    ${currentExercises.map((ex, index) => `
+      <div class="workout-line">
+        <span>${ex.name} ${formatExercise(ex)}</span>
+        <button class="small-btn delete-btn" onclick="removeCurrentExercise(${index})">削除</button>
       </div>
     `).join("")}
   `;
 }
 
-function makeChatGPTText() {
-  const textarea = document.getElementById("chatgptCopy");
-  const last = getLatestResult();
-  const prev = getPreviousResult();
-
-  let text = "";
-
-  text += "次回の筋トレメニューを相談したいです。\n\n";
-
-  if (last) {
-    text += "前回の実績は以下です。\n";
-    text += last.raw + "\n\n";
-  }
-
-  if (prev) {
-    text += "その前の実績は以下です。\n";
-    text += prev.raw + "\n\n";
-  }
-
-  text += "無理しすぎず、前回より少しだけ伸ばすメニューを考えてください。\n";
-  text += "疲労が残る場合の軽めメニューも一緒に提案してください。";
-
-  textarea.value = text;
+function removeCurrentExercise(index) {
+  currentExercises.splice(index, 1);
+  renderCurrentWorkout();
 }
 
-function copyForChatGPT() {
-  const textarea = document.getElementById("chatgptCopy");
-  textarea.select();
-  document.execCommand("copy");
-  alert("ChatGPT相談用の文章をコピーしました");
+function saveWorkout() {
+  if (currentExercises.length === 0) {
+    alert("実績を追加してください");
+    return;
+  }
+
+  const date = getDisplayDate();
+
+  workouts.push({
+    date,
+    exercises: currentExercises,
+    createdAt: new Date().toISOString()
+  });
+
+  localStorage.setItem("workouts", JSON.stringify(workouts));
+
+  currentExercises = [];
+  renderAll();
+
+  alert("実績を保存しました");
+}
+
+function getDisplayDate() {
+  const value = document.getElementById("workoutDate").value;
+
+  if (!value) return "日付不明";
+
+  const [yyyy, mm, dd] = value.split("-");
+  return `${Number(mm)}/${Number(dd)}`;
+}
+
+function renderAll() {
+  renderTodayPlan();
+  renderCurrentWorkout();
+  renderLastWorkout();
+  renderHistory();
+}
+
+function renderTodayPlan() {
+  const area = document.getElementById("todayPlanArea");
+
+  if (plans.length === 0) {
+    area.innerHTML = `<p class="empty">まだ予定メモはありません。</p>`;
+    return;
+  }
+
+  const latest = plans[plans.length - 1];
+
+  area.innerHTML = `
+    <div class="date-title">最新の予定メモ</div>
+    <div class="memo-box">${escapeHtml(latest.raw)}</div>
+  `;
+}
+
+function renderLastWorkout() {
+  const area = document.getElementById("lastWorkoutArea");
+
+  if (workouts.length === 0) {
+    area.innerHTML = `<p class="empty">まだ実績がありません。</p>`;
+    return;
+  }
+
+  const last = workouts[workouts.length - 1];
+
+  area.innerHTML = `
+    <div class="date-title">${last.date}</div>
+    ${last.exercises.map(ex => `
+      <div class="workout-line">
+        <span>${ex.name} ${formatExercise(ex)}</span>
+      </div>
+    `).join("")}
+  `;
+}
+
+function renderHistory() {
+  const area = document.getElementById("historyArea");
+
+  if (workouts.length === 0) {
+    area.innerHTML = `<p class="empty">まだ履歴がありません。</p>`;
+    return;
+  }
+
+  const reversed = [...workouts].reverse();
+
+  area.innerHTML = reversed.map((workout, index) => {
+    const originalIndex = workouts.length - 1 - index;
+
+    return `
+      <div class="history-item">
+        <div class="history-header" onclick="toggleHistory(${index})">
+          ${workout.date}
+        </div>
+        <div class="history-body" id="historyBody${index}">
+          ${workout.exercises.map(ex => `
+            <div class="workout-line">
+              <span>${ex.name} ${formatExercise(ex)}</span>
+            </div>
+          `).join("")}
+          <button class="delete-btn" onclick="deleteWorkout(${originalIndex})">この日の実績を削除</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function toggleHistory(index) {
+  const body = document.getElementById(`historyBody${index}`);
+  body.classList.toggle("open");
+}
+
+function deleteWorkout(index) {
+  if (!confirm("この日の実績を削除しますか？")) return;
+
+  workouts.splice(index, 1);
+  localStorage.setItem("workouts", JSON.stringify(workouts));
+  renderAll();
+}
+
+function clearAllData() {
+  if (!confirm("すべてのデータを削除しますか？")) return;
+
+  plans = [];
+  workouts = [];
+  currentExercises = [];
+
+  localStorage.removeItem("plans");
+  localStorage.removeItem("workouts");
+
+  renderAll();
+
+  alert("すべて削除しました");
 }
 
 function formatExercise(ex) {
   return `${ex.weight}×${ex.reps}×${ex.sets}`;
 }
 
-function volume(ex) {
-  return ex.weight * ex.reps * ex.sets;
-}
-
-function clearAllData() {
-  if (!confirm("すべてのデータを削除しますか？")) return;
-
-  localStorage.removeItem("plans");
-  localStorage.removeItem("results");
-
-  plans = [];
-  results = [];
-
-  renderAll();
-  alert("削除しました");
+function escapeHtml(text) {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
