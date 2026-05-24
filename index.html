@@ -470,6 +470,22 @@ function saveWorkout(){
   render();
 }
 
+function copyWorkoutToPlan(date){
+  const workout = workouts.find(w=>w.date===date);
+  if(!workout) return;
+
+  const text =
+    `${date}のメニュー\n` +
+    workout.exercises.map(ex =>
+      `${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`
+    ).join("\n");
+
+  localStorage.setItem("plan", text);
+  renderPlan();
+  window.scrollTo({top:0, behavior:"smooth"});
+  statusText("予定メモへ入力しました");
+}
+
 function render(){
   sortWorkouts();
   renderPlan();
@@ -687,6 +703,7 @@ function renderHistory(){
               <span>${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span>
             </div>
           `).join("")}
+          <button class="save" onclick="copyWorkoutToPlan('${w.date}')">今日の予定へ入力</button>
           <button class="danger" onclick="deleteWorkout(${original})">この日の実績を削除</button>
         </div>
       </div>
