@@ -43,6 +43,7 @@ button:active{transform:scale(.98)}
 .chest{background:#ef4444}.back{background:#3b82f6}.leg{background:#22c55e}.core{background:#a855f7}.cardio{background:#f97316}.other{background:#64748b}
 canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;margin-top:10px}
 .volume-line{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0}
+.period-box{background:#f1f5f9;border-radius:12px;padding:12px;margin:8px 0 12px;font-weight:bold;color:#334155}
 </style>
 </head>
 
@@ -135,6 +136,7 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 <button onclick="setVolumeRange('month')" id="range-month">今月</button>
 <button onclick="setVolumeRange('all')" id="range-all">全期間</button>
 </div>
+<div id="volumePeriod" class="period-box">対象期間：-</div>
 <div id="volumeArea"></div>
 </section>
 
@@ -250,6 +252,16 @@ function dateToNumber(dateText){
   return (m || 0) * 100 + (d || 0);
 }
 
+function dateKeyToDate(dateText){
+  const now = new Date();
+  const [m,d] = String(dateText).split("/").map(Number);
+  return new Date(now.getFullYear(), (m || 1)-1, d || 1);
+}
+
+function formatDateObj(date){
+  return `${date.getMonth()+1}/${date.getDate()}`;
+}
+
 function sortWorkouts(){
   workouts.sort((a,b)=>dateToNumber(a.date)-dateToNumber(b.date));
 }
@@ -300,9 +312,27 @@ function selectExercise(name){
 
 function updateLabels(){
   const cardio = selectedExercise==="トレッドミル" || selectedExercise==="バイク";
-  document.getElementById("labelWeight").textContent = cardio ? "負荷・傾斜" : "重量";
-  document.getElementById("labelReps").textContent = cardio ? "速度" : "回数";
-  document.getElementById("labelSets").textContent = cardio ? "分" : "セット";
+  const abBench = selectedExercise==="アブベンチ";
+
+  if(cardio){
+    document.getElementById("labelWeight").textContent = "負荷・傾斜";
+    document.getElementById("labelReps").textContent = "速度";
+    document.getElementById("labelSets").textContent = "分";
+  }else if(abBench){
+    document.getElementById("labelWeight").textContent = "負荷";
+    document.getElementById("labelReps").textContent = "回数";
+    document.getElementById("labelSets").textContent = "セット";
+  }else{
+    document.getElementById("labelWeight").textContent = "重量";
+    document.getElementById("labelReps").textContent = "回数";
+    document.getElementById("labelSets").textContent = "セット";
+  }
+}
+
+function metricLabel(name){
+  if(name==="アブベンチ") return "負荷";
+  if(name==="トレッドミル" || name==="バイク") return "負荷・傾斜";
+  return "重量";
 }
 
 function setActiveInput(id){
@@ -527,25 +557,51 @@ function setVolumeRange(r){
   renderVolume();
 }
 
-function getWorkoutDateObj(w){
+function getVolumePeriod(){
   const now = new Date();
-  const [m,d] = w.date.split("/").map(Number);
-  return new Date(now.getFullYear(), m-1, d);
+
+  if(volumeRange==="today"){
+    const selected = getSelectedDateKey();
+    const date = selected ? dateKeyToDate(selected) : now;
+    return {start:date, end:date, label:`対象期間：${formatDateObj(date)}`};
+  }
+
+  if(volumeRange==="week"){
+    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const start = new Date(end);
+    start.setDate(end.getDate()-6);
+    return {start, end, label:`対象期間：${formatDateObj(start)}〜${formatDateObj(end)}`};
+  }
+
+  if(volumeRange==="month"){
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth()+1, 0);
+    return {start, end, label:`対象期間：${formatDateObj(start)}〜${formatDateObj(end)}`};
+  }
+
+  if(workouts.length){
+    const sorted = getSortedAsc();
+    const start = dateKeyToDate(sorted[0].date);
+    const end = dateKeyToDate(sorted[sorted.length-1].date);
+    return {start, end, label:`対象期間：${formatDateObj(start)}〜${formatDateObj(end)}`};
+  }
+
+  return {start:null, end:null, label:"対象期間：-"};  
 }
 
 function renderVolume(){
   const area = document.getElementById("volumeArea");
-  const now = new Date();
+  const periodArea = document.getElementById("volumePeriod");
+  const period = getVolumePeriod();
+
+  periodArea.textContent = period.label;
+
   let filtered = [...workouts];
 
-  if(volumeRange!=="all"){
+  if(period.start && period.end){
     filtered = workouts.filter(w=>{
-      const date = getWorkoutDateObj(w);
-      const diff = (now-date)/(1000*60*60*24);
-      if(volumeRange==="today") return w.date===getSelectedDateKey();
-      if(volumeRange==="week") return diff>=0 && diff<7;
-      if(volumeRange==="month") return diff>=0 && diff<31;
-      return true;
+      const d = dateKeyToDate(w.date);
+      return d >= period.start && d <= period.end;
     });
   }
 
@@ -668,7 +724,7 @@ function drawGraph(){
   const range = max-min || 1;
 
   ctx.font = "14px sans-serif";
-  ctx.fillText(name+" 最大重量・負荷・傾斜の推移",20,24);
+  ctx.fillText(name+" 最大"+metricLabel(name)+"の推移",20,24);
 
   ctx.beginPath();
 
