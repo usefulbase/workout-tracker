@@ -10,27 +10,31 @@ header{background:#111827;color:white;text-align:center;padding:20px}
 main{padding:16px;max-width:760px;margin:auto}
 .card{background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 4px 14px #0001}
 h2{margin-top:0}
-textarea,input,select,button{width:100%;padding:12px;margin-top:8px;border-radius:12px;font-size:16px;box-sizing:border-box}
-textarea{min-height:120px}
+textarea,input,button{width:100%;padding:12px;margin-top:8px;border-radius:12px;font-size:16px;box-sizing:border-box}
+textarea{min-height:110px}
 button{border:0;background:#2563eb;color:white;font-weight:bold}
 button:active{transform:scale(.98)}
 .save{background:#16a34a}
 .danger{background:#dc2626}
-.gray{background:#64748b}
 .status{background:#ecfeff;color:#155e75;padding:12px;border-radius:12px;margin-bottom:16px;font-weight:bold}
 .line{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #eee;padding:10px 0}
 .small{width:auto;padding:7px 10px;font-size:12px}
 .memo{white-space:pre-wrap;background:#f8fafc;padding:12px;border-radius:12px;margin-top:12px}
+.btn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.btn-grid button{margin-top:0;background:#e5e7eb;color:#111827}
+.btn-grid button.active{background:#2563eb;color:white}
+.input-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.input-row input.active{border:2px solid #2563eb;background:#eff6ff}
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.keypad button{margin-top:0;background:#e5e7eb;color:#111827}
+.keypad .main{background:#2563eb;color:white}
+.keypad .danger{background:#dc2626;color:white}
+.keypad .wide{grid-column:span 2}
 .history{border:1px solid #ddd;border-radius:12px;margin-bottom:10px;overflow:hidden}
 .history-head{background:#f1f5f9;padding:12px;font-weight:bold}
 .history-body{padding:12px;display:none}
 .open{display:block}
-.btn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-.btn-grid button{margin-top:0;background:#e5e7eb;color:#111827}
-.btn-grid button.active{background:#2563eb;color:white}
-.quick-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:6px}
-.quick-grid button{margin-top:0;padding:9px;background:#f1f5f9;color:#111827;font-size:14px}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
 .tabs button{margin-top:0;background:#e5e7eb;color:#111827}
 .tabs button.active{background:#111827;color:white}
 .note{font-size:13px;color:#64748b}
@@ -66,17 +70,51 @@ canvas{width:100%;height:220px;border:1px solid #e5e7eb;border-radius:12px;margi
 
 <div id="lastForSelected" class="memo">種目を選ぶと前回実績を表示します。</div>
 
-<label>重量・傾斜</label>
-<input type="number" id="weightInput" inputmode="decimal">
-<div class="quick-grid" id="weightButtons"></div>
+<div class="input-row">
+  <div>
+    <label>重量・傾斜</label>
+    <input id="weightInput" readonly onclick="setActiveInput('weightInput')">
+  </div>
+  <div>
+    <label>回数・速度</label>
+    <input id="repsInput" readonly onclick="setActiveInput('repsInput')">
+  </div>
+  <div>
+    <label>セット・分</label>
+    <input id="setsInput" readonly onclick="setActiveInput('setsInput')">
+  </div>
+</div>
 
-<label>回数・速度</label>
-<input type="number" id="repsInput" inputmode="decimal">
-<div class="quick-grid" id="repsButtons"></div>
+<div class="keypad">
+<button onclick="keyInput('7')">7</button>
+<button onclick="keyInput('8')">8</button>
+<button onclick="keyInput('9')">9</button>
+<button onclick="keyBack()">←</button>
 
-<label>セット・分</label>
-<input type="number" id="setsInput" inputmode="numeric">
-<div class="quick-grid" id="setsButtons"></div>
+<button onclick="keyInput('4')">4</button>
+<button onclick="keyInput('5')">5</button>
+<button onclick="keyInput('6')">6</button>
+<button onclick="keyClear()" class="danger">C</button>
+
+<button onclick="keyInput('1')">1</button>
+<button onclick="keyInput('2')">2</button>
+<button onclick="keyInput('3')">3</button>
+<button onclick="keyInput('.')">.</button>
+
+<button onclick="keyInput('0')">0</button>
+<button onclick="keyInput('00')">00</button>
+<button onclick="moveNext()" class="main wide">次へ</button>
+
+<button onclick="quickSet('weightInput','0')">傾斜0</button>
+<button onclick="quickSet('weightInput','1')">傾斜1</button>
+<button onclick="quickSet('repsInput','4.5')">速度4.5</button>
+<button onclick="quickSet('setsInput','15')">15分</button>
+
+<button onclick="quickSet('repsInput','10')">10回</button>
+<button onclick="quickSet('repsInput','12')">12回</button>
+<button onclick="quickSet('repsInput','15')">15回</button>
+<button onclick="quickSet('setsInput','2')">2セット</button>
+</div>
 
 <button onclick="addExercise()">実績に追加</button>
 <div id="currentArea"></div>
@@ -90,8 +128,7 @@ canvas{width:100%;height:220px;border:1px solid #e5e7eb;border-radius:12px;margi
 </section>
 
 <section class="card">
-<h2>ChatGPT相談用コピー</h2>
-<p class="note">前回実績をそのままコピーして、今日のメニュー相談に使えます。</p>
+<h2>前回実績コピー用</h2>
 <textarea id="copyText" readonly></textarea>
 <button onclick="copyLastWorkout()">前回実績をコピー</button>
 </section>
@@ -103,6 +140,8 @@ canvas{width:100%;height:220px;border:1px solid #e5e7eb;border-radius:12px;margi
 <button onclick="setTab('chest')" id="tab-chest">胸</button>
 <button onclick="setTab('back')" id="tab-back">背中</button>
 <button onclick="setTab('leg')" id="tab-leg">脚</button>
+<button onclick="setTab('core')" id="tab-core">腹</button>
+<button onclick="setTab('cardio')" id="tab-cardio">有酸素</button>
 </div>
 <div id="historyArea"></div>
 </section>
@@ -124,21 +163,24 @@ let workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
 let current = [];
 let selectedExercise = "レッグプレス";
 let currentTab = "all";
+let activeInput = "weightInput";
 
-const exercises = ["トレッドミル","レッグプレス","チェストプレス","ラットプルダウン","アブダクション","アダクション","その他"];
+const exercises = ["トレッドミル","レッグプレス","チェストプレス","ラットプルダウン","アブダクション","アダクション","アブベンチ","その他"];
+
 const parts = {
   "チェストプレス":"chest",
   "ラットプルダウン":"back",
   "レッグプレス":"leg",
   "アブダクション":"leg",
   "アダクション":"leg",
-  "トレッドミル":"all"
+  "アブベンチ":"core",
+  "トレッドミル":"cardio"
 };
 
 document.addEventListener("DOMContentLoaded", function(){
   document.getElementById("dateInput").value = new Date().toISOString().slice(0,10);
   makeExerciseButtons();
-  makeQuickButtons();
+  setActiveInput("weightInput");
   statusText("アプリを読み込みました");
   render();
 });
@@ -160,17 +202,38 @@ function selectExercise(name){
   renderLastForSelected();
 }
 
-function makeQuickButtons(){
-  makeButtons("weightButtons",[0,10,15,20,25,30,35,40,45,50,55,60,65,70,75],"weightInput");
-  makeButtons("repsButtons",[4.5,5,8,10,12,15,20,25,30],"repsInput");
-  makeButtons("setsButtons",[1,2,3,4,5,10,15,20],"setsInput");
+function setActiveInput(id){
+  activeInput=id;
+  ["weightInput","repsInput","setsInput"].forEach(x=>{
+    document.getElementById(x).classList.toggle("active",x===id);
+  });
 }
 
-function makeButtons(areaId,values,inputId){
-  document.getElementById(areaId).innerHTML=values.map(v=>`<button onclick="setValue('${inputId}',${v})">${v}</button>`).join("");
+function keyInput(v){
+  const input=document.getElementById(activeInput);
+  if(v==="." && input.value.includes("."))return;
+  input.value += v;
 }
 
-function setValue(id,v){document.getElementById(id).value=v;}
+function keyBack(){
+  const input=document.getElementById(activeInput);
+  input.value=input.value.slice(0,-1);
+}
+
+function keyClear(){
+  document.getElementById(activeInput).value="";
+}
+
+function quickSet(id,value){
+  document.getElementById(id).value=value;
+  setActiveInput(id);
+}
+
+function moveNext(){
+  if(activeInput==="weightInput")setActiveInput("repsInput");
+  else if(activeInput==="repsInput")setActiveInput("setsInput");
+  else setActiveInput("weightInput");
+}
 
 function savePlan(){
   const text=document.getElementById("planInput").value.trim();
@@ -193,9 +256,12 @@ function addExercise(){
   if(!weight||!reps||!sets){alert("重量・回数・セットを入力してください");return;}
 
   current.push({name,weight,reps,sets});
+
   document.getElementById("weightInput").value="";
   document.getElementById("repsInput").value="";
   document.getElementById("setsInput").value="";
+  setActiveInput("weightInput");
+
   statusText("実績に追加しました");
   renderCurrent();
 }
@@ -240,7 +306,10 @@ function renderLastForSelected(){
   let found=[];
   for(let i=workouts.length-1;i>=0;i--){
     found=workouts[i].exercises.filter(ex=>ex.name===selectedExercise);
-    if(found.length){area.innerHTML=`前回の${selectedExercise}：\n`+found.map(ex=>`${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`).join("\n");return;}
+    if(found.length){
+      area.innerHTML=`前回の${selectedExercise}：\n`+found.map(ex=>`${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`).join("\n");
+      return;
+    }
   }
   area.innerHTML=`${selectedExercise} の前回実績はまだありません。`;
 }
@@ -249,7 +318,7 @@ function renderCopyText(){
   const t=document.getElementById("copyText");
   if(workouts.length===0){t.value="";return;}
   const w=workouts[workouts.length-1];
-  t.value=`前回の実績です。\n${w.date}\n`+w.exercises.map(ex=>`${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`).join("\n")+`\n\nこの内容をもとに、今日の筋トレメニューを考えてください。`;
+  t.value=`${w.date}\n`+w.exercises.map(ex=>`${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`).join("\n");
 }
 
 function copyLastWorkout(){
@@ -261,7 +330,7 @@ function copyLastWorkout(){
 
 function setTab(tab,rerender=true){
   currentTab=tab;
-  ["all","chest","back","leg"].forEach(x=>{
+  ["all","chest","back","leg","core","cardio"].forEach(x=>{
     const b=document.getElementById("tab-"+x);
     if(b)b.classList.toggle("active",x===tab);
   });
