@@ -15,6 +15,7 @@ body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
 header{background:#111827;color:white;text-align:center;padding:20px}
 main{padding:16px;max-width:820px;margin:auto}
 .card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 4px 14px #0001}
+h1{margin:0}
 h2{margin-top:0}
 textarea,input,button,select{width:100%;padding:12px;margin-top:8px;border-radius:12px;font-size:16px;box-sizing:border-box;border:1px solid var(--line)}
 textarea{min-height:100px}
@@ -44,13 +45,15 @@ button:active{transform:scale(.98)}
 canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;margin-top:10px}
 .volume-line{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0}
 .period-box{background:#f1f5f9;border-radius:12px;padding:12px;margin:8px 0 12px;font-weight:bold;color:#334155}
+.collapse-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin:0}
+.collapse-body{display:none;margin-top:12px}
+.collapse-body.open{display:block}
 </style>
 </head>
 
 <body>
 <header>
 <h1>Workout Tracker</h1>
-<p>予定・実績・履歴・推移・バックアップ</p>
 </header>
 
 <main>
@@ -123,12 +126,6 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 </section>
 
 <section class="card">
-<h2>前回実績コピー用</h2>
-<textarea id="copyText" readonly></textarea>
-<button onclick="copyLastWorkout()">前回実績をコピー</button>
-</section>
-
-<section class="card">
 <h2>種目別総ボリューム</h2>
 <div class="tabs">
 <button onclick="setVolumeRange('today')" id="range-today">今日</button>
@@ -160,7 +157,20 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 </section>
 
 <section class="card">
-<h2>バックアップ</h2>
+<h2 class="collapse-head" onclick="toggleCollapse('copySection')">
+前回実績コピー用 <span>▼</span>
+</h2>
+<div id="copySection" class="collapse-body">
+<textarea id="copyText" readonly></textarea>
+<button onclick="copyLastWorkout()">前回実績をコピー</button>
+</div>
+</section>
+
+<section class="card">
+<h2 class="collapse-head" onclick="toggleCollapse('backupSection')">
+バックアップ <span>▼</span>
+</h2>
+<div id="backupSection" class="collapse-body">
 <div class="memo">【バックアップの使い方】
 
 ①「バックアップ作成」を押す
@@ -182,11 +192,16 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 <button onclick="shareBackup()">バックアップを共有</button>
 <textarea id="backupArea"></textarea>
 <button onclick="restoreBackup()">バックアップ復元</button>
+</div>
 </section>
 
 <section class="card">
-<h2>データ管理</h2>
+<h2 class="collapse-head" onclick="toggleCollapse('dataSection')">
+データ管理 <span>▼</span>
+</h2>
+<div id="dataSection" class="collapse-body">
 <button class="danger" onclick="clearAll()">全データ削除</button>
+</div>
 </section>
 </main>
 
@@ -232,6 +247,10 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 function statusText(t){
   document.getElementById("status").textContent = t;
+}
+
+function toggleCollapse(id){
+  document.getElementById(id).classList.toggle("open");
 }
 
 function badge(name){
@@ -822,6 +841,12 @@ function clearAll(){
 
   render();
   statusText("すべて削除しました");
+}
+
+function metricLabel(name){
+  if(name==="アブベンチ") return "負荷";
+  if(name==="トレッドミル" || name==="バイク") return "負荷・傾斜";
+  return "重量";
 }
 
 function escapeHtml(text){
