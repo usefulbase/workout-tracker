@@ -103,6 +103,7 @@ button:active{
   padding:12px;
   border-radius:12px;
   margin-top:12px;
+  line-height:1.7;
 }
 
 .btn-grid{
@@ -352,8 +353,31 @@ canvas{
 <section class="card">
 <h2>バックアップ</h2>
 
+<div class="memo">
+【バックアップの使い方】
+
+①「バックアップ作成」を押す  
+②「コピー」または「共有」  
+③ LINEメモやスマホのメモに保存
+
+機種変更やデータ削除後は、
+保存しておいた文字列を貼り付けて「復元」で戻せます。
+</div>
+
+<div id="backupTime" class="memo">
+まだバックアップしていません。
+</div>
+
 <button class="gray" onclick="createBackup()">
 バックアップ作成
+</button>
+
+<button onclick="copyBackup()">
+バックアップをコピー
+</button>
+
+<button onclick="shareBackup()">
+バックアップを共有
 </button>
 
 <textarea id="backupArea"></textarea>
@@ -377,7 +401,8 @@ canvas{
 
 <script>
 
-let workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+let workouts =
+JSON.parse(localStorage.getItem("workouts") || "[]");
 
 let current = [];
 
@@ -431,7 +456,8 @@ function makeExerciseButtons(){
 
 const area=document.getElementById("exerciseButtons");
 
-area.innerHTML=exercises.map(x=>
+area.innerHTML=
+exercises.map(x=>
 `<button id="ex-${x}" onclick="selectExercise('${x}')">${x}</button>`
 ).join("");
 
@@ -971,12 +997,73 @@ plan:localStorage.getItem("plan") || ""
 };
 
 const encoded=
-btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+btoa(
+unescape(
+encodeURIComponent(
+JSON.stringify(data)
+)
+)
+);
 
 document.getElementById("backupArea").value=
 "WT-BACKUP:"+encoded;
 
+const now=new Date();
+
+const time=
+now.getMonth()+1 + "/" +
+now.getDate() + " " +
+String(now.getHours()).padStart(2,"0") + ":" +
+String(now.getMinutes()).padStart(2,"0");
+
+document.getElementById("backupTime").innerHTML=
+`最終バックアップ：${time}`;
+
 statusText("バックアップを作成しました");
+
+}
+
+function copyBackup(){
+
+const area=document.getElementById("backupArea");
+
+area.select();
+
+document.execCommand("copy");
+
+statusText("バックアップをコピーしました");
+
+}
+
+async function shareBackup(){
+
+const text=document.getElementById("backupArea").value;
+
+if(!text){
+alert("先にバックアップを作成してください");
+return;
+}
+
+if(navigator.share){
+
+try{
+
+await navigator.share({
+title:"Workout Tracker Backup",
+text:text
+});
+
+statusText("共有しました");
+
+}
+catch(e){}
+
+}
+else{
+
+alert("この端末では共有に対応していません");
+
+}
 
 }
 
@@ -998,7 +1085,11 @@ try{
 const encoded=text.replace("WT-BACKUP:","");
 
 const decoded=
-decodeURIComponent(escape(atob(encoded)));
+decodeURIComponent(
+escape(
+atob(encoded)
+)
+);
 
 const data=JSON.parse(decoded);
 
