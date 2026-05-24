@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 </head>
+
 <body>
   <header>
     <h1>Workout Tracker</h1>
@@ -14,6 +15,8 @@
   </header>
 
   <main>
+    <div id="statusArea" class="status">読み込み中...</div>
+
     <section class="card">
       <h2>今日の予定メモ</h2>
       <textarea id="planInput" placeholder="例：
@@ -21,17 +24,17 @@
 トレッドミル 0×4.5×10
 レッグプレス50×12×2
 チェストプレス25×10×2"></textarea>
-      <button onclick="savePlan()">予定メモを保存</button>
+      <button id="savePlanBtn">予定メモを保存</button>
       <div id="todayPlanArea"></div>
     </section>
 
     <section class="card">
       <h2>今日の実績入力</h2>
 
-      <label>日付</label>
+      <label for="workoutDate">日付</label>
       <input type="date" id="workoutDate" />
 
-      <label>種目</label>
+      <label for="exerciseName">種目</label>
       <select id="exerciseName">
         <option value="トレッドミル">トレッドミル</option>
         <option value="レッグプレス">レッグプレス</option>
@@ -42,28 +45,28 @@
         <option value="その他">その他</option>
       </select>
 
-      <input type="text" id="customExerciseName" placeholder="その他の種目名" class="hidden" />
+      <input type="text" id="customExerciseName" class="hidden" placeholder="その他の種目名" />
 
       <div class="input-grid">
         <div>
-          <label>重量・傾斜</label>
+          <label for="weightInput">重量・傾斜</label>
           <input type="number" id="weightInput" inputmode="decimal" step="0.5" placeholder="例 50" />
         </div>
         <div>
-          <label>回数・速度</label>
+          <label for="repsInput">回数・速度</label>
           <input type="number" id="repsInput" inputmode="decimal" step="0.1" placeholder="例 12" />
         </div>
         <div>
-          <label>セット・分</label>
+          <label for="setsInput">セット・分</label>
           <input type="number" id="setsInput" inputmode="numeric" step="1" placeholder="例 2" />
         </div>
       </div>
 
-      <button onclick="addExercise()">実績に追加</button>
+      <button id="addExerciseBtn">実績に追加</button>
 
       <div id="currentWorkoutArea"></div>
 
-      <button class="save-btn" onclick="saveWorkout()">今日の実績を保存</button>
+      <button id="saveWorkoutBtn" class="save-btn">今日の実績を保存</button>
     </section>
 
     <section class="card">
@@ -78,7 +81,7 @@
 
     <section class="card danger">
       <h2>データ管理</h2>
-      <button onclick="clearAllData()">全データ削除</button>
+      <button id="clearAllBtn">全データ削除</button>
     </section>
   </main>
 </body>
