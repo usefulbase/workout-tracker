@@ -2,309 +2,109 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Workout Tracker</title>
+<meta name="theme-color" content="#111827">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
 
 <style>
-body{
-  margin:0;
-  font-family:system-ui;
-  background:#f4f6f8;
-  color:#222;
+:root{
+  --bg:#f4f6f8;--card:#fff;--text:#222;--muted:#64748b;--main:#2563eb;
+  --dark:#111827;--line:#e5e7eb;--soft:#f8fafc;
 }
-
-header{
-  background:#111827;
-  color:white;
-  text-align:center;
-  padding:20px;
+body.dark{
+  --bg:#0f172a;--card:#1e293b;--text:#f8fafc;--muted:#cbd5e1;--line:#334155;--soft:#0f172a;
 }
-
-main{
-  padding:16px;
-  max-width:760px;
-  margin:auto;
-}
-
-.card{
-  background:white;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:16px;
-  box-shadow:0 4px 14px rgba(0,0,0,.06);
-}
-
-h2{
-  margin-top:0;
-}
-
-textarea,input,button{
-  width:100%;
-  padding:12px;
-  margin-top:8px;
-  border-radius:12px;
-  font-size:16px;
-  box-sizing:border-box;
-}
-
-textarea{
-  min-height:110px;
-}
-
-button{
-  border:0;
-  background:#2563eb;
-  color:white;
-  font-weight:bold;
-}
-
-button:active{
-  transform:scale(.98);
-}
-
-.save{
-  background:#16a34a;
-}
-
-.danger{
-  background:#dc2626;
-}
-
-.gray{
-  background:#64748b;
-}
-
-.status{
-  background:#ecfeff;
-  color:#155e75;
-  padding:12px;
-  border-radius:12px;
-  margin-bottom:16px;
-  font-weight:bold;
-}
-
-.line{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  border-bottom:1px solid #eee;
-  padding:10px 0;
-}
-
-.small{
-  width:auto;
-  padding:7px 10px;
-  font-size:12px;
-}
-
-.memo{
-  white-space:pre-wrap;
-  background:#f8fafc;
-  padding:12px;
-  border-radius:12px;
-  margin-top:12px;
-  line-height:1.7;
-}
-
-.btn-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin-top:8px;
-}
-
-.btn-grid button{
-  margin-top:0;
-  background:#e5e7eb;
-  color:#111827;
-}
-
-.btn-grid button.active{
-  background:#2563eb;
-  color:white;
-}
-
-.input-row{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:8px;
-}
-
-.input-row input.active{
-  border:2px solid #2563eb;
-  background:#eff6ff;
-}
-
-.keypad{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
-  margin-top:10px;
-}
-
-.keypad button{
-  margin-top:0;
-  background:#e5e7eb;
-  color:#111827;
-}
-
-.keypad .main{
-  background:#2563eb;
-  color:white;
-}
-
-.keypad .danger{
-  background:#dc2626;
-  color:white;
-}
-
-.keypad .wide{
-  grid-column:span 2;
-}
-
-.history{
-  border:1px solid #ddd;
-  border-radius:12px;
-  margin-bottom:10px;
-  overflow:hidden;
-}
-
-.history-head{
-  background:#f1f5f9;
-  padding:12px;
-  font-weight:bold;
-}
-
-.history-body{
-  padding:12px;
-  display:none;
-}
-
-.open{
-  display:block;
-}
-
-.tabs{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin-bottom:10px;
-}
-
-.tabs button{
-  margin-top:0;
-  background:#e5e7eb;
-  color:#111827;
-}
-
-.tabs button.active{
-  background:#111827;
-  color:white;
-}
-
-canvas{
-  width:100%;
-  height:220px;
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  margin-top:10px;
-}
+body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
+header{background:var(--dark);color:white;text-align:center;padding:20px}
+main{padding:16px;max-width:820px;margin:auto}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 4px 14px #0001}
+h2{margin-top:0}
+textarea,input,button,select{width:100%;padding:12px;margin-top:8px;border-radius:12px;font-size:16px;box-sizing:border-box;border:1px solid var(--line)}
+textarea{min-height:100px}
+button{border:0;background:var(--main);color:white;font-weight:bold}
+button:active{transform:scale(.98)}
+.save{background:#16a34a}.danger{background:#dc2626}.gray{background:#64748b}
+.status{background:#ecfeff;color:#155e75;padding:12px;border-radius:12px;margin-bottom:16px;font-weight:bold}
+body.dark .status{background:#164e63;color:#ecfeff}
+.memo{white-space:pre-wrap;background:var(--soft);padding:12px;border-radius:12px;margin-top:12px;line-height:1.7}
+.line{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:10px 0}
+.small{width:auto;padding:7px 10px;font-size:12px}
+.btn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.btn-grid button{margin-top:0;background:#e5e7eb;color:#111827}
+.btn-grid button.active{background:var(--main);color:white}
+.input-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.input-row input.active{border:2px solid var(--main);background:#eff6ff}
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.keypad button{margin-top:0;background:#e5e7eb;color:#111827}
+.keypad .main{background:var(--main);color:white}.keypad .danger{background:#dc2626;color:white}.wide{grid-column:span 2}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.tabs button{margin-top:0;background:#e5e7eb;color:#111827}
+.tabs button.active{background:#111827;color:white}
+.history{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.history-head{background:#f1f5f9;padding:12px;font-weight:bold}
+body.dark .history-head{background:#334155}
+.history-body{padding:12px;display:none}.open{display:block}
+.badge{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;margin-right:6px;color:white}
+.chest{background:#ef4444}.back{background:#3b82f6}.leg{background:#22c55e}.core{background:#a855f7}.cardio{background:#f97316}.other{background:#64748b}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:var(--soft);border-radius:12px;padding:12px;text-align:center}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.day{background:var(--soft);border-radius:10px;padding:8px;text-align:center;min-height:42px}.hit{outline:2px solid var(--main);font-weight:bold}
+canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;margin-top:10px}
 </style>
 </head>
 
 <body>
-
 <header>
 <h1>Workout Tracker</h1>
-<p>予定メモ・実績入力・履歴・推移</p>
+<p>予定・実績・履歴・推移・バックアップ</p>
 </header>
 
 <main>
+<div id="status" class="status">読み込み中...</div>
 
-<div id="status" class="status">
-読み込み中...
-</div>
+<section class="card">
+<h2>設定</h2>
+<button onclick="toggleDark()">ダークモード切替</button>
+<button class="gray" onclick="resetExercises()">種目並びを初期化</button>
+</section>
 
 <section class="card">
 <h2>今日の予定メモ</h2>
-
-<textarea id="planInput"></textarea>
-
-<button onclick="savePlan()">
-予定メモを保存
-</button>
-
+<textarea id="planInput" placeholder="例&#10;5/24予定&#10;レッグプレス50×12×2&#10;チェストプレス25×10×2"></textarea>
+<button onclick="savePlan()">予定メモを保存</button>
+<button class="save" onclick="planToCurrent()">予定を実績入力へ追加</button>
 <div id="planArea"></div>
 </section>
 
 <section class="card">
 <h2>今日の実績入力</h2>
-
 <label>日付</label>
 <input type="date" id="dateInput">
 
 <label>種目</label>
-
 <div class="btn-grid" id="exerciseButtons"></div>
-
 <input id="customName" placeholder="その他の種目名">
 
-<div id="lastForSelected" class="memo">
-種目を選ぶと前回実績を表示します。
-</div>
+<div id="lastForSelected" class="memo">種目を選ぶと前回実績を表示します。</div>
 
 <div class="input-row">
-
-<div>
-<label>重量・傾斜</label>
-<input id="weightInput" readonly onclick="setActiveInput('weightInput')">
-</div>
-
-<div>
-<label>回数・速度</label>
-<input id="repsInput" readonly onclick="setActiveInput('repsInput')">
-</div>
-
-<div>
-<label>セット・分</label>
-<input id="setsInput" readonly onclick="setActiveInput('setsInput')">
-</div>
-
+<div><label id="labelWeight">重量・傾斜</label><input id="weightInput" readonly onclick="setActiveInput('weightInput')"></div>
+<div><label id="labelReps">回数・速度</label><input id="repsInput" readonly onclick="setActiveInput('repsInput')"></div>
+<div><label id="labelSets">セット・分</label><input id="setsInput" readonly onclick="setActiveInput('setsInput')"></div>
 </div>
 
 <div class="keypad">
-
-<button onclick="keyInput('7')">7</button>
-<button onclick="keyInput('8')">8</button>
-<button onclick="keyInput('9')">9</button>
-<button onclick="keyBack()">←</button>
-
-<button onclick="keyInput('4')">4</button>
-<button onclick="keyInput('5')">5</button>
-<button onclick="keyInput('6')">6</button>
-<button onclick="keyClear()" class="danger">C</button>
-
-<button onclick="keyInput('1')">1</button>
-<button onclick="keyInput('2')">2</button>
-<button onclick="keyInput('3')">3</button>
-<button onclick="keyInput('.')">.</button>
-
-<button onclick="keyInput('0')">0</button>
-<button onclick="keyInput('00')">00</button>
-<button onclick="moveNext()" class="main wide">次へ</button>
-
+<button onclick="keyInput('7')">7</button><button onclick="keyInput('8')">8</button><button onclick="keyInput('9')">9</button><button onclick="keyBack()">←</button>
+<button onclick="keyInput('4')">4</button><button onclick="keyInput('5')">5</button><button onclick="keyInput('6')">6</button><button onclick="keyClear()" class="danger">C</button>
+<button onclick="keyInput('1')">1</button><button onclick="keyInput('2')">2</button><button onclick="keyInput('3')">3</button><button onclick="keyInput('.')">.</button>
+<button onclick="keyInput('0')">0</button><button onclick="keyInput('00')">00</button><button onclick="moveNext()" class="main wide">次へ</button>
 </div>
 
-<button onclick="addExercise()">
-実績に追加
-</button>
-
+<button onclick="addExercise()">実績に追加</button>
 <div id="currentArea"></div>
-
-<button class="save" onclick="saveWorkout()">
-今日の実績を保存
-</button>
-
+<button class="save" onclick="saveWorkout()">今日の実績を保存</button>
 </section>
 
 <section class="card">
@@ -314,836 +114,205 @@ canvas{
 
 <section class="card">
 <h2>前回実績コピー用</h2>
-
 <textarea id="copyText" readonly></textarea>
+<button onclick="copyLastWorkout()">前回実績をコピー</button>
+</section>
 
-<button onclick="copyLastWorkout()">
-前回実績をコピー
-</button>
-
+<section class="card">
+<h2>集計</h2>
+<div class="stat-grid">
+<div class="stat"><strong id="statCount">0</strong><br>記録日数</div>
+<div class="stat"><strong id="statVolume">0</strong><br>総ボリューム</div>
+<div class="stat"><strong id="statPR">0</strong><br>PR数</div>
+</div>
 </section>
 
 <section class="card">
 <h2>履歴</h2>
-
 <div class="tabs">
-
 <button onclick="setTab('all')" id="tab-all">全部</button>
 <button onclick="setTab('chest')" id="tab-chest">胸</button>
 <button onclick="setTab('back')" id="tab-back">背中</button>
 <button onclick="setTab('leg')" id="tab-leg">脚</button>
 <button onclick="setTab('core')" id="tab-core">腹</button>
 <button onclick="setTab('cardio')" id="tab-cardio">有酸素</button>
-
 </div>
-
 <div id="historyArea"></div>
+</section>
 
+<section class="card">
+<h2>カレンダー</h2>
+<div id="calendarArea" class="calendar"></div>
 </section>
 
 <section class="card">
 <h2>推移グラフ</h2>
-
 <select id="graphExercise" onchange="drawGraph()"></select>
-
 <canvas id="graph" width="700" height="260"></canvas>
-
 </section>
 
 <section class="card">
 <h2>バックアップ</h2>
-
-<div class="memo">
-【バックアップの使い方】
-
-①「バックアップ作成」を押す  
-②「コピー」または「共有」  
-③ LINEメモやスマホのメモに保存
-
-機種変更やデータ削除後は、
-保存しておいた文字列を貼り付けて「復元」で戻せます。
-</div>
-
-<div id="backupTime" class="memo">
-まだバックアップしていません。
-</div>
-
-<button class="gray" onclick="createBackup()">
-バックアップ作成
-</button>
-
-<button onclick="copyBackup()">
-バックアップをコピー
-</button>
-
-<button onclick="shareBackup()">
-バックアップを共有
-</button>
-
+<div class="memo">①バックアップ作成 → ②コピーまたは共有 → ③LINEメモやスマホのメモに保存。復元時は文字列を貼って「復元」。</div>
+<div id="backupTime" class="memo">まだバックアップしていません。</div>
+<button class="gray" onclick="createBackup()">バックアップ作成</button>
+<button onclick="copyBackup()">バックアップをコピー</button>
+<button onclick="shareBackup()">バックアップを共有</button>
 <textarea id="backupArea"></textarea>
-
-<button onclick="restoreBackup()">
-バックアップ復元
-</button>
-
+<button onclick="restoreBackup()">バックアップ復元</button>
 </section>
 
 <section class="card">
 <h2>データ管理</h2>
-
-<button class="danger" onclick="clearAll()">
-全データ削除
-</button>
-
+<button class="danger" onclick="clearAll()">全データ削除</button>
 </section>
-
 </main>
 
 <script>
+let workouts=JSON.parse(localStorage.getItem("workouts")||"[]");
+let current=[];
+let selectedExercise="レッグプレス";
+let currentTab="all";
+let activeInput="weightInput";
+let dark=localStorage.getItem("dark")==="1";
 
-let workouts =
-JSON.parse(localStorage.getItem("workouts") || "[]");
+const defaultExercises=["トレッドミル","レッグプレス","チェストプレス","ラットプルダウン","アブダクション","アダクション","アブベンチ","その他"];
+let exercises=JSON.parse(localStorage.getItem("exercises")||"null")||defaultExercises;
 
-let current = [];
+const parts={"チェストプレス":"chest","ラットプルダウン":"back","レッグプレス":"leg","アブダクション":"leg","アダクション":"leg","アブベンチ":"core","トレッドミル":"cardio"};
 
-let selectedExercise = "レッグプレス";
-
-let currentTab = "all";
-
-let activeInput = "weightInput";
-
-const exercises = [
-"トレッドミル",
-"レッグプレス",
-"チェストプレス",
-"ラットプルダウン",
-"アブダクション",
-"アダクション",
-"アブベンチ",
-"その他"
-];
-
-const parts = {
-"チェストプレス":"chest",
-"ラットプルダウン":"back",
-"レッグプレス":"leg",
-"アブダクション":"leg",
-"アダクション":"leg",
-"アブベンチ":"core",
-"トレッドミル":"cardio"
-};
-
-document.addEventListener("DOMContentLoaded",function(){
-
-document.getElementById("dateInput").value =
-new Date().toISOString().slice(0,10);
-
-makeExerciseButtons();
-
-setActiveInput("weightInput");
-
-statusText("アプリを読み込みました");
-
-render();
-
+document.addEventListener("DOMContentLoaded",()=>{
+ if(dark)document.body.classList.add("dark");
+ document.getElementById("dateInput").value=new Date().toISOString().slice(0,10);
+ makeExerciseButtons();setActiveInput("weightInput");statusText("アプリを読み込みました");render();
 });
 
-function statusText(text){
-document.getElementById("status").textContent=text;
-}
+function statusText(t){document.getElementById("status").textContent=t}
+function partOf(n){return parts[n]||"other"}
+function badge(n){return `<span class="badge ${partOf(n)}">${partName(partOf(n))}</span>`}
+function partName(p){return {chest:"胸",back:"背中",leg:"脚",core:"腹",cardio:"有酸素",other:"他"}[p]}
+
+function toggleDark(){dark=!dark;localStorage.setItem("dark",dark?"1":"0");document.body.classList.toggle("dark",dark)}
+function resetExercises(){exercises=[...defaultExercises];localStorage.setItem("exercises",JSON.stringify(exercises));makeExerciseButtons();statusText("種目並びを初期化しました")}
 
 function makeExerciseButtons(){
-
-const area=document.getElementById("exerciseButtons");
-
-area.innerHTML=
-exercises.map(x=>
-`<button id="ex-${x}" onclick="selectExercise('${x}')">${x}</button>`
-).join("");
-
-selectExercise(selectedExercise);
-
+ const area=document.getElementById("exerciseButtons");
+ area.innerHTML=exercises.map((x,i)=>`
+ <div>
+ <button id="ex-${x}" onclick="selectExercise('${x}')">${x}</button>
+ <div style="display:flex;gap:4px">
+ <button class="small gray" onclick="moveExercise(${i},-1)">↑</button>
+ <button class="small gray" onclick="moveExercise(${i},1)">↓</button>
+ </div></div>`).join("");
+ selectExercise(selectedExercise);
 }
-
-function selectExercise(name){
-
-selectedExercise=name;
-
-exercises.forEach(x=>{
-
-const b=document.getElementById("ex-"+x);
-
-if(b){
-b.classList.toggle("active",x===name);
+function moveExercise(i,d){
+ const j=i+d;if(j<0||j>=exercises.length)return;
+ [exercises[i],exercises[j]]=[exercises[j],exercises[i]];
+ localStorage.setItem("exercises",JSON.stringify(exercises));makeExerciseButtons();
 }
-
-});
-
-renderLastForSelected();
-
+function selectExercise(n){
+ selectedExercise=n;
+ exercises.forEach(x=>{const b=document.getElementById("ex-"+x);if(b)b.classList.toggle("active",x===n)});
+ updateLabels();renderLastForSelected();
 }
-
-function setActiveInput(id){
-
-activeInput=id;
-
-["weightInput","repsInput","setsInput"].forEach(x=>{
-
-document.getElementById(x).classList.toggle(
-"active",
-x===id
-);
-
-});
-
+function updateLabels(){
+ const cardio=selectedExercise==="トレッドミル";
+ document.getElementById("labelWeight").textContent=cardio?"傾斜":"重量";
+ document.getElementById("labelReps").textContent=cardio?"速度":"回数";
+ document.getElementById("labelSets").textContent=cardio?"分":"セット";
 }
-
-function keyInput(v){
-
-const input=document.getElementById(activeInput);
-
-if(v==="." && input.value.includes(".")) return;
-
-input.value+=v;
-
-}
-
-function keyBack(){
-
-const input=document.getElementById(activeInput);
-
-input.value=input.value.slice(0,-1);
-
-}
-
-function keyClear(){
-document.getElementById(activeInput).value="";
-}
-
-function moveNext(){
-
-if(activeInput==="weightInput"){
-setActiveInput("repsInput");
-}
-else if(activeInput==="repsInput"){
-setActiveInput("setsInput");
-}
-else{
-setActiveInput("weightInput");
-}
-
-}
+function setActiveInput(id){activeInput=id;["weightInput","repsInput","setsInput"].forEach(x=>document.getElementById(x).classList.toggle("active",x===id))}
+function keyInput(v){const i=document.getElementById(activeInput);if(v==="."&&i.value.includes("."))return;i.value+=v}
+function keyBack(){const i=document.getElementById(activeInput);i.value=i.value.slice(0,-1)}
+function keyClear(){document.getElementById(activeInput).value=""}
+function moveNext(){activeInput==="weightInput"?setActiveInput("repsInput"):activeInput==="repsInput"?setActiveInput("setsInput"):setActiveInput("weightInput")}
 
 function savePlan(){
-
-const text=document.getElementById("planInput").value.trim();
-
-if(!text){
-alert("予定メモを入力してください");
-return;
+ const t=document.getElementById("planInput").value.trim();if(!t){alert("予定メモを入力してください");return}
+ localStorage.setItem("plan",t);document.getElementById("planInput").value="";statusText("予定メモを保存しました");render();
 }
-
-localStorage.setItem("plan",text);
-
-document.getElementById("planInput").value="";
-
-statusText("予定メモを保存しました");
-
-render();
-
+function planToCurrent(){
+ const t=localStorage.getItem("plan")||"";if(!t){alert("予定メモがありません");return}
+ const parsed=parseLines(t);if(parsed.length===0){alert("読み取れる予定がありません");return}
+ current=current.concat(parsed);renderCurrent();statusText("予定を実績入力へ追加しました");
+}
+function parseLines(text){
+ return text.split("\n").map(s=>s.trim()).filter(Boolean).map(line=>{
+  const m=line.match(/^(.+?)(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)$/);
+  if(!m)return null;return {name:m[1].trim(),weight:m[2],reps:m[3],sets:m[4]};
+ }).filter(Boolean);
 }
 
 function addExercise(){
-
-let name=selectedExercise;
-
-const custom=document.getElementById("customName").value.trim();
-
-if(name==="その他" && custom){
-name=custom;
+ let name=selectedExercise;const custom=document.getElementById("customName").value.trim();if(name==="その他"&&custom)name=custom;
+ const weight=document.getElementById("weightInput").value,reps=document.getElementById("repsInput").value,sets=document.getElementById("setsInput").value;
+ if(!weight||!reps||!sets){alert("重量・回数・セットを入力してください");return}
+ current.push({name,weight,reps,sets});
+ ["weightInput","repsInput","setsInput"].forEach(id=>document.getElementById(id).value="");setActiveInput("weightInput");
+ statusText("実績に追加しました");renderCurrent();
 }
-
-const weight=document.getElementById("weightInput").value;
-const reps=document.getElementById("repsInput").value;
-const sets=document.getElementById("setsInput").value;
-
-if(!weight || !reps || !sets){
-
-alert("重量・回数・セットを入力してください");
-
-return;
-
-}
-
-current.push({
-name,
-weight,
-reps,
-sets
-});
-
-document.getElementById("weightInput").value="";
-document.getElementById("repsInput").value="";
-document.getElementById("setsInput").value="";
-
-setActiveInput("weightInput");
-
-statusText("実績に追加しました");
-
-renderCurrent();
-
-}
-
 function saveWorkout(){
-
-if(current.length===0){
-
-alert("先に実績に追加してください");
-
-return;
-
+ if(current.length===0){alert("先に実績に追加してください");return}
+ const d=document.getElementById("dateInput").value.split("-");const date=Number(d[1])+"/"+Number(d[2]);
+ const ex=workouts.find(w=>w.date===date);
+ if(ex){ex.exercises=ex.exercises.concat(current);statusText(date+" の実績に追加保存しました")}else{workouts.push({date,exercises:current});statusText("実績を保存しました")}
+ localStorage.setItem("workouts",JSON.stringify(workouts));current=[];render();
 }
-
-const d=document.getElementById("dateInput").value.split("-");
-
-const date=
-Number(d[1])+"/"+Number(d[2]);
-
-const existing=workouts.find(w=>w.date===date);
-
-if(existing){
-
-existing.exercises=
-existing.exercises.concat(current);
-
-statusText(date+" の実績に追加保存しました");
-
-}
-else{
-
-workouts.push({
-date,
-exercises:current
-});
-
-statusText("実績を保存しました");
-
-}
-
-localStorage.setItem(
-"workouts",
-JSON.stringify(workouts)
-);
-
-current=[];
-
-render();
-
-}
-
-function render(){
-
-renderPlan();
-renderCurrent();
-renderLast();
-renderCopyText();
-renderHistory();
-renderGraphSelect();
-drawGraph();
-renderLastForSelected();
-setTab(currentTab,false);
-
-}
-
-function renderPlan(){
-
-const text=localStorage.getItem("plan");
-
-document.getElementById("planArea").innerHTML=text
-? `<div class="memo">${escapeHtml(text)}</div>`
-: "<p>まだ予定メモはありません。</p>";
-
-}
-
-function renderCurrent(){
-
-document.getElementById("currentArea").innerHTML=current.length
-? current.map((ex,i)=>`
-<div class="line">
-<span>${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span>
-<button class="small danger" onclick="removeCurrent(${i})">削除</button>
-</div>
-`).join("")
-: "<p>まだ実績が追加されていません。</p>";
-
-}
-
-function removeCurrent(i){
-
-current.splice(i,1);
-
-renderCurrent();
-
-}
-
+function render(){renderPlan();renderCurrent();renderLast();renderCopyText();renderStats();renderHistory();renderCalendar();renderGraphSelect();drawGraph();renderLastForSelected();setTab(currentTab,false)}
+function renderPlan(){const t=localStorage.getItem("plan");document.getElementById("planArea").innerHTML=t?`<div class="memo">${escapeHtml(t)}</div>`:"<p>まだ予定メモはありません。</p>"}
+function renderCurrent(){document.getElementById("currentArea").innerHTML=current.length?current.map((ex,i)=>`<div class="line"><span>${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span><button class="small danger" onclick="removeCurrent(${i})">削除</button></div>`).join(""):"<p>まだ実績が追加されていません。</p>"}
+function removeCurrent(i){current.splice(i,1);renderCurrent()}
 function renderLast(){
-
-const area=document.getElementById("lastArea");
-
-if(workouts.length===0){
-
-area.innerHTML="<p>まだ実績がありません。</p>";
-
-return;
-
+ const a=document.getElementById("lastArea");if(workouts.length===0){a.innerHTML="<p>まだ実績がありません。</p>";return}
+ const w=workouts[workouts.length-1];a.innerHTML=`<strong>${w.date}</strong>`+w.exercises.map(ex=>`<div class="line"><span>${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span><button class="small" onclick="fillFromExercise('${ex.name}','${ex.weight}','${ex.reps}','${ex.sets}')">入力</button></div>`).join("");
 }
-
-const w=workouts[workouts.length-1];
-
-area.innerHTML=
-`<strong>${w.date}</strong>`+
-w.exercises.map(ex=>
-`<div class="line"><span>${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span></div>`
-).join("");
-
-}
-
 function renderLastForSelected(){
-
-const area=document.getElementById("lastForSelected");
-
-for(let i=workouts.length-1;i>=0;i--){
-
-const found=
-workouts[i].exercises.filter(
-ex=>ex.name===selectedExercise
-);
-
-if(found.length){
-
-area.innerHTML=
-`前回の${selectedExercise}：\n`+
-found.map(ex=>
-`${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`
-).join("\n");
-
-return;
-
+ const a=document.getElementById("lastForSelected");
+ for(let i=workouts.length-1;i>=0;i--){
+  const f=workouts[i].exercises.filter(ex=>ex.name===selectedExercise);
+  if(f.length){a.innerHTML=`前回の${selectedExercise}：\n`+f.map(ex=>`${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}　[タップで入力]`).join("\n");a.onclick=()=>fillFromExercise(f[0].name,f[0].weight,f[0].reps,f[0].sets);return}
+ }
+ a.innerHTML=`${selectedExercise} の前回実績はまだありません。`;a.onclick=null;
 }
-
+function fillFromExercise(n,w,r,s){selectExercise(n);document.getElementById("weightInput").value=w;document.getElementById("repsInput").value=r;document.getElementById("setsInput").value=s;statusText("前回実績を入力欄に反映しました")}
+function renderCopyText(){const t=document.getElementById("copyText");if(!workouts.length){t.value="";return}const w=workouts[workouts.length-1];t.value=`${w.date}\n`+w.exercises.map(ex=>`${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`).join("\n")}
+function copyLastWorkout(){const t=document.getElementById("copyText");t.select();document.execCommand("copy");statusText("前回実績をコピーしました")}
+function calcVol(ex){return partOf(ex.name)==="cardio"?0:Number(ex.weight)*Number(ex.reps)*Number(ex.sets)}
+function renderStats(){
+ document.getElementById("statCount").textContent=workouts.length;
+ document.getElementById("statVolume").textContent=Math.round(workouts.flatMap(w=>w.exercises).reduce((s,e)=>s+calcVol(e),0));
+ document.getElementById("statPR").textContent=countPR();
 }
-
-area.innerHTML=
-`${selectedExercise} の前回実績はまだありません。`;
-
-}
-
-function renderCopyText(){
-
-const t=document.getElementById("copyText");
-
-if(workouts.length===0){
-
-t.value="";
-
-return;
-
-}
-
-const w=workouts[workouts.length-1];
-
-t.value=
-`${w.date}\n`+
-w.exercises.map(ex=>
-`${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`
-).join("\n");
-
-}
-
-function copyLastWorkout(){
-
-const t=document.getElementById("copyText");
-
-t.select();
-
-document.execCommand("copy");
-
-statusText("前回実績をコピーしました");
-
-}
-
-function setTab(tab,rerender=true){
-
-currentTab=tab;
-
-[
-"all",
-"chest",
-"back",
-"leg",
-"core",
-"cardio"
-].forEach(x=>{
-
-const b=document.getElementById("tab-"+x);
-
-if(b){
-b.classList.toggle("active",x===tab);
-}
-
-});
-
-if(rerender){
-renderHistory();
-}
-
-}
-
+function countPR(){const m={};let c=0;workouts.forEach(w=>w.exercises.forEach(e=>{const v=Number(e.weight);if(!m[e.name]||v>m[e.name]){m[e.name]=v;c++}}));return c}
+function setTab(tab,rerender=true){currentTab=tab;["all","chest","back","leg","core","cardio"].forEach(x=>{const b=document.getElementById("tab-"+x);if(b)b.classList.toggle("active",x===tab)});if(rerender)renderHistory()}
 function renderHistory(){
-
-const area=document.getElementById("historyArea");
-
-if(workouts.length===0){
-
-area.innerHTML="<p>まだ履歴がありません。</p>";
-
-return;
-
+ const a=document.getElementById("historyArea");if(!workouts.length){a.innerHTML="<p>まだ履歴がありません。</p>";return}
+ a.innerHTML=workouts.slice().reverse().map((w,ri)=>{const orig=workouts.length-1-ri;const f=w.exercises.filter(ex=>currentTab==="all"||partOf(ex.name)===currentTab);if(!f.length)return"";return `<div class="history"><div class="history-head" onclick="toggleHistory(${ri})">${w.date}</div><div class="history-body" id="h${ri}">${f.map(ex=>`<div class="line"><span>${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span></div>`).join("")}<button class="danger" onclick="deleteWorkout(${orig})">この日の実績を削除</button></div></div>`}).join("");
 }
-
-area.innerHTML=
-workouts.slice().reverse().map((w,ri)=>{
-
-const original=
-workouts.length-1-ri;
-
-const filtered=
-w.exercises.filter(
-ex=>currentTab==="all" ||
-parts[ex.name]===currentTab
-);
-
-if(filtered.length===0){
-return "";
+function toggleHistory(i){document.getElementById("h"+i).classList.toggle("open")}
+function deleteWorkout(i){if(!confirm("削除しますか？"))return;workouts.splice(i,1);localStorage.setItem("workouts",JSON.stringify(workouts));render();statusText("実績を削除しました")}
+function renderCalendar(){
+ const a=document.getElementById("calendarArea");const now=new Date();const y=now.getFullYear(),m=now.getMonth();const days=new Date(y,m+1,0).getDate();const hits=new Set(workouts.map(w=>w.date));
+ a.innerHTML=["日","月","火","水","木","金","土"].map(d=>`<div><b>${d}</b></div>`).join("");
+ for(let i=0;i<new Date(y,m,1).getDay();i++)a.innerHTML+=`<div></div>`;
+ for(let d=1;d<=days;d++){const key=(m+1)+"/"+d;a.innerHTML+=`<div class="day ${hits.has(key)?"hit":""}" onclick="openDate('${key}')">${d}</div>`}
 }
-
-return `
-<div class="history">
-
-<div class="history-head"
-onclick="toggleHistory(${ri})">
-${w.date}
-</div>
-
-<div class="history-body" id="h${ri}">
-
-${filtered.map(ex=>
-`<div class="line"><span>${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span></div>`
-).join("")}
-
-<button class="danger"
-onclick="deleteWorkout(${original})">
-この日の実績を削除
-</button>
-
-</div>
-</div>
-`;
-
-}).join("");
-
-}
-
-function toggleHistory(i){
-
-document.getElementById("h"+i)
-.classList.toggle("open");
-
-}
-
-function deleteWorkout(i){
-
-if(!confirm("削除しますか？")) return;
-
-workouts.splice(i,1);
-
-localStorage.setItem(
-"workouts",
-JSON.stringify(workouts)
-);
-
-render();
-
-statusText("実績を削除しました");
-
-}
-
-function renderGraphSelect(){
-
-const names=[
-...new Set(
-workouts.flatMap(
-w=>w.exercises.map(ex=>ex.name)
-)
-)
-];
-
-const sel=document.getElementById("graphExercise");
-
-const old=sel.value;
-
-sel.innerHTML=
-names.map(n=>`<option>${n}</option>`).join("");
-
-if(names.includes(old)){
-sel.value=old;
-}
-
-}
-
+function openDate(date){const i=workouts.findIndex(w=>w.date===date);if(i>=0){currentTab="all";renderHistory();statusText(date+" の記録があります")}}
+function renderGraphSelect(){const names=[...new Set(workouts.flatMap(w=>w.exercises.map(ex=>ex.name)))];const s=document.getElementById("graphExercise"),old=s.value;s.innerHTML=names.map(n=>`<option>${n}</option>`).join("");if(names.includes(old))s.value=old}
 function drawGraph(){
-
-const canvas=document.getElementById("graph");
-
-const ctx=canvas.getContext("2d");
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-const name=document.getElementById("graphExercise").value;
-
-if(!name) return;
-
-const data=
-workouts.map(w=>{
-
-const xs=
-w.exercises.filter(ex=>ex.name===name);
-
-if(xs.length===0) return null;
-
-const max=
-Math.max(...xs.map(ex=>Number(ex.weight)));
-
-return {
-date:w.date,
-value:max
-};
-
-}).filter(Boolean);
-
-if(data.length===0) return;
-
-const max=Math.max(...data.map(d=>d.value));
-const min=Math.min(...data.map(d=>d.value));
-
-const range=max-min || 1;
-
-ctx.font="14px sans-serif";
-
-ctx.fillText(
-name+" 最大重量・傾斜の推移",
-20,
-24
-);
-
-ctx.beginPath();
-
-data.forEach((d,i)=>{
-
-const x=
-40+i*(620/Math.max(data.length-1,1));
-
-const y=
-220-((d.value-min)/range)*150;
-
-if(i===0){
-ctx.moveTo(x,y);
+ const c=document.getElementById("graph"),ctx=c.getContext("2d");ctx.clearRect(0,0,c.width,c.height);const name=document.getElementById("graphExercise").value;if(!name)return;
+ const data=workouts.map(w=>{const xs=w.exercises.filter(ex=>ex.name===name);if(!xs.length)return null;return{date:w.date,value:Math.max(...xs.map(ex=>Number(ex.weight)))}}).filter(Boolean);if(!data.length)return;
+ const max=Math.max(...data.map(d=>d.value)),min=Math.min(...data.map(d=>d.value)),range=max-min||1;ctx.font="14px sans-serif";ctx.fillStyle=getComputedStyle(document.body).color;ctx.fillText(name+" 最大重量・傾斜の推移",20,24);ctx.beginPath();
+ data.forEach((d,i)=>{const x=40+i*(620/Math.max(data.length-1,1)),y=220-((d.value-min)/range)*150;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);ctx.fillText(d.value,x-8,y-8);ctx.fillText(d.date,x-14,245)});ctx.stroke();
+ data.forEach((d,i)=>{const x=40+i*(620/Math.max(data.length-1,1)),y=220-((d.value-min)/range)*150;ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill()});
 }
-else{
-ctx.lineTo(x,y);
-}
-
-ctx.fillText(d.value,x-8,y-8);
-
-ctx.fillText(d.date,x-14,245);
-
-});
-
-ctx.stroke();
-
-data.forEach((d,i)=>{
-
-const x=
-40+i*(620/Math.max(data.length-1,1));
-
-const y=
-220-((d.value-min)/range)*150;
-
-ctx.beginPath();
-
-ctx.arc(x,y,4,0,Math.PI*2);
-
-ctx.fill();
-
-});
-
-}
-
-function createBackup(){
-
-const data={
-workouts,
-plan:localStorage.getItem("plan") || ""
-};
-
-const encoded=
-btoa(
-unescape(
-encodeURIComponent(
-JSON.stringify(data)
-)
-)
-);
-
-document.getElementById("backupArea").value=
-"WT-BACKUP:"+encoded;
-
-const now=new Date();
-
-const time=
-now.getMonth()+1 + "/" +
-now.getDate() + " " +
-String(now.getHours()).padStart(2,"0") + ":" +
-String(now.getMinutes()).padStart(2,"0");
-
-document.getElementById("backupTime").innerHTML=
-`最終バックアップ：${time}`;
-
-statusText("バックアップを作成しました");
-
-}
-
-function copyBackup(){
-
-const area=document.getElementById("backupArea");
-
-area.select();
-
-document.execCommand("copy");
-
-statusText("バックアップをコピーしました");
-
-}
-
-async function shareBackup(){
-
-const text=document.getElementById("backupArea").value;
-
-if(!text){
-alert("先にバックアップを作成してください");
-return;
-}
-
-if(navigator.share){
-
-try{
-
-await navigator.share({
-title:"Workout Tracker Backup",
-text:text
-});
-
-statusText("共有しました");
-
-}
-catch(e){}
-
-}
-else{
-
-alert("この端末では共有に対応していません");
-
-}
-
-}
-
-function restoreBackup(){
-
-const text=
-document.getElementById("backupArea").value.trim();
-
-if(!text.startsWith("WT-BACKUP:")){
-
-alert("バックアップ文字列が正しくありません");
-
-return;
-
-}
-
-try{
-
-const encoded=text.replace("WT-BACKUP:","");
-
-const decoded=
-decodeURIComponent(
-escape(
-atob(encoded)
-)
-);
-
-const data=JSON.parse(decoded);
-
-workouts=data.workouts || [];
-
-localStorage.setItem(
-"workouts",
-JSON.stringify(workouts)
-);
-
-localStorage.setItem(
-"plan",
-data.plan || ""
-);
-
-render();
-
-statusText("バックアップを復元しました");
-
-}
-catch(e){
-
-alert("復元に失敗しました");
-
-}
-
-}
-
-function clearAll(){
-
-if(!confirm("すべて削除しますか？")) return;
-
-workouts=[];
-current=[];
-
-localStorage.removeItem("workouts");
-localStorage.removeItem("plan");
-
-render();
-
-statusText("すべて削除しました");
-
-}
-
-function escapeHtml(text){
-
-return text
-.replaceAll("&","&amp;")
-.replaceAll("<","&lt;")
-.replaceAll(">","&gt;");
-
-}
-
+function createBackup(){const data={workouts,plan:localStorage.getItem("plan")||"",exercises,dark};const enc=btoa(unescape(encodeURIComponent(JSON.stringify(data))));document.getElementById("backupArea").value="WT-BACKUP:"+enc;document.getElementById("backupTime").innerHTML="最終バックアップ："+new Date().toLocaleString();statusText("バックアップを作成しました")}
+function copyBackup(){const a=document.getElementById("backupArea");a.select();document.execCommand("copy");statusText("バックアップをコピーしました")}
+async function shareBackup(){const text=document.getElementById("backupArea").value;if(!text){alert("先にバックアップを作成してください");return}if(navigator.share){await navigator.share({title:"Workout Tracker Backup",text}).catch(()=>{})}else alert("この端末では共有に対応していません")}
+function restoreBackup(){const t=document.getElementById("backupArea").value.trim();if(!t.startsWith("WT-BACKUP:")){alert("バックアップ文字列が正しくありません");return}try{const d=JSON.parse(decodeURIComponent(escape(atob(t.replace("WT-BACKUP:","")))));workouts=d.workouts||[];exercises=d.exercises||defaultExercises;dark=!!d.dark;localStorage.setItem("workouts",JSON.stringify(workouts));localStorage.setItem("plan",d.plan||"");localStorage.setItem("exercises",JSON.stringify(exercises));localStorage.setItem("dark",dark?"1":"0");document.body.classList.toggle("dark",dark);makeExerciseButtons();render();statusText("バックアップを復元しました")}catch(e){alert("復元に失敗しました")}}
+function clearAll(){if(!confirm("すべて削除しますか？"))return;workouts=[];current=[];localStorage.removeItem("workouts");localStorage.removeItem("plan");render();statusText("すべて削除しました")}
+function escapeHtml(t){return String(t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")}
 </script>
-
 </body>
 </html>
