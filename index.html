@@ -21,7 +21,6 @@
   --dark:#111827;
   --green:#16a34a;
   --red:#dc2626;
-  --orange:#f97316;
 }
 
 body{
@@ -578,7 +577,6 @@ canvas{
 </section>
 </main>
 
-
 <script>
 let workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
 let bodyRecords = JSON.parse(localStorage.getItem("bodyRecords") || "[]");
@@ -625,6 +623,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   setActiveInput("weightInput");
 
   statusText("アプリを読み込みました");
+
   render();
 });
 
@@ -638,6 +637,7 @@ function toggleCollapse(id){
 
 function badge(name){
   const p = parts[name] || "other";
+
   const label = {
     chest:"胸",
     back:"背中",
@@ -652,27 +652,33 @@ function badge(name){
 
 function getSelectedDateKey(){
   const value = document.getElementById("dateInput").value;
+
   if(!value) return "";
 
   const [y,m,d] = value.split("-").map(Number);
+
   return `${m}/${d}`;
 }
 
 function getBodyDateKey(){
   const value = document.getElementById("bodyDateInput").value;
+
   if(!value) return "";
 
   const [y,m,d] = value.split("-").map(Number);
+
   return `${m}/${d}`;
 }
 
 function dateToNumber(dateText){
   const [m,d] = String(dateText).split("/").map(Number);
+
   return (m || 0) * 100 + (d || 0);
 }
 
 function dateKeyToDate(dateText){
   const now = new Date();
+
   const [m,d] = String(dateText).split("/").map(Number);
 
   return new Date(
@@ -695,30 +701,6 @@ function sortWorkouts(){
 function sortBodyRecords(){
   bodyRecords.sort((a,b)=>
     dateToNumber(a.date)-dateToNumber(b.date)
-  );
-}
-
-function getSortedAsc(){
-  return [...workouts].sort((a,b)=>
-    dateToNumber(a.date)-dateToNumber(b.date)
-  );
-}
-
-function getSortedDesc(){
-  return [...workouts].sort((a,b)=>
-    dateToNumber(b.date)-dateToNumber(a.date)
-  );
-}
-
-function getBodySortedAsc(){
-  return [...bodyRecords].sort((a,b)=>
-    dateToNumber(a.date)-dateToNumber(b.date)
-  );
-}
-
-function getBodySortedDesc(){
-  return [...bodyRecords].sort((a,b)=>
-    dateToNumber(b.date)-dateToNumber(a.date)
   );
 }
 
@@ -772,6 +754,7 @@ function normalizeBodyRecords(){
 }
 
 function makeExerciseButtons(){
+
   const area =
     document.getElementById("exerciseButtons");
 
@@ -784,6 +767,7 @@ function makeExerciseButtons(){
 }
 
 function selectExercise(name){
+
   selectedExercise = name;
 
   exercises.forEach(x=>{
@@ -795,10 +779,12 @@ function selectExercise(name){
   });
 
   updateLabels();
+
   renderLastForSelected();
 }
 
 function updateLabels(){
+
   const cardio =
     selectedExercise==="トレッドミル" ||
     selectedExercise==="バイク";
@@ -807,16 +793,19 @@ function updateLabels(){
     selectedExercise==="アブベンチ";
 
   if(cardio){
+
     document.getElementById("labelWeight").textContent = "負荷・傾斜";
     document.getElementById("labelReps").textContent = "速度";
     document.getElementById("labelSets").textContent = "分";
   }
   else if(abBench){
+
     document.getElementById("labelWeight").textContent = "負荷";
     document.getElementById("labelReps").textContent = "回数";
     document.getElementById("labelSets").textContent = "セット";
   }
   else{
+
     document.getElementById("labelWeight").textContent = "重量";
     document.getElementById("labelReps").textContent = "回数";
     document.getElementById("labelSets").textContent = "セット";
@@ -824,10 +813,12 @@ function updateLabels(){
 }
 
 function setActiveInput(id){
+
   activeInput = id;
 
   ["weightInput","repsInput","setsInput"]
     .forEach(x=>{
+
       document
         .getElementById(x)
         .classList.toggle("active", x===id);
@@ -835,6 +826,7 @@ function setActiveInput(id){
 }
 
 function keyInput(v){
+
   const input =
     document.getElementById(activeInput);
 
@@ -844,6 +836,7 @@ function keyInput(v){
 }
 
 function keyBack(){
+
   const input =
     document.getElementById(activeInput);
 
@@ -856,6 +849,7 @@ function keyClear(){
 }
 
 function moveNext(){
+
   if(activeInput==="weightInput"){
     setActiveInput("repsInput");
   }
@@ -868,6 +862,7 @@ function moveNext(){
 }
 
 function savePlan(){
+
   const text =
     document.getElementById("planInput")
       .value
@@ -888,6 +883,7 @@ function savePlan(){
 }
 
 function parseLines(text){
+
   return text
     .split("\n")
     .map(s=>s.trim())
@@ -911,6 +907,7 @@ function parseLines(text){
 }
 
 function planToCurrent(){
+
   const text =
     localStorage.getItem("plan") || "";
 
@@ -992,12 +989,14 @@ function saveWorkout(){
     workouts.find(w=>w.date===date);
 
   if(existing){
+
     existing.exercises =
       existing.exercises.concat(current);
 
     statusText(date+" の実績に追加保存しました");
   }
   else{
+
     workouts.push({
       date,
       exercises:current
@@ -1045,6 +1044,7 @@ function saveBodyRecord(){
     bodyRecords.find(r=>r.date===date);
 
   if(existing){
+
     existing.weight = weight;
     existing.fat = fat;
     existing.muscle = muscle;
@@ -1052,6 +1052,7 @@ function saveBodyRecord(){
     statusText("身体記録を更新しました");
   }
   else{
+
     bodyRecords.push({
       date,
       weight,
@@ -1069,13 +1070,7 @@ function saveBodyRecord(){
     JSON.stringify(bodyRecords)
   );
 
-  renderBodyRecords();
-  drawBodyGraph();
-  renderDashboard();
-
-  document.getElementById("bodyWeightInput").value = "";
-  document.getElementById("bodyFatInput").value = "";
-  document.getElementById("bodyMuscleInput").value = "";
+  render();
 }
 
 function render(){
@@ -1087,18 +1082,83 @@ function render(){
   renderPlan();
   renderCurrent();
   renderLast();
+  renderLastForSelected();
+  renderCopyText();
   renderVolume();
   renderHistory();
-  renderCopyText();
   renderBodyRecords();
   renderGraphSelect();
 
   drawGraph();
   drawBodyGraph();
 
-  renderLastForSelected();
-
   setTab(currentTab,false);
+}
+
+function renderDashboard(){
+
+  const now = new Date();
+
+  const today =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+  const weekStart = new Date(today);
+
+  weekStart.setDate(today.getDate()-6);
+
+  const monthStart =
+    new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const monthEnd =
+    new Date(now.getFullYear(), now.getMonth()+1, 0);
+
+  const weekCount =
+    workouts.filter(w=>{
+
+      const d = dateKeyToDate(w.date);
+
+      return d >= weekStart && d <= today;
+    }).length;
+
+  let monthVolume = 0;
+
+  workouts.forEach(w=>{
+
+    const d = dateKeyToDate(w.date);
+
+    if(d >= monthStart && d <= monthEnd){
+
+      w.exercises.forEach(ex=>{
+        monthVolume += calcVolume(ex);
+      });
+    }
+  });
+
+  const latestBody =
+    [...bodyRecords]
+      .sort((a,b)=>
+        dateToNumber(b.date)-dateToNumber(a.date)
+      )[0];
+
+  document.getElementById("dashWeekCount").textContent =
+    weekCount;
+
+  document.getElementById("dashMonthVolume").textContent =
+    Math.round(monthVolume);
+
+  document.getElementById("dashWeight").textContent =
+    latestBody?.weight
+      ? latestBody.weight+"kg"
+      : "-";
+
+  document.getElementById("dashFat").textContent =
+    latestBody?.fat
+      ? latestBody.fat+"%"
+      : "-";
 }
 </script>
 
