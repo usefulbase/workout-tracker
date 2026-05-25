@@ -121,6 +121,44 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 </section>
 
 <section class="card">
+<h2 class="collapse-head" onclick="toggleCollapse('bodySection')">
+身体記録 <span>▼</span>
+</h2>
+<div id="bodySection" class="collapse-body">
+<label>日付</label>
+<input type="date" id="bodyDateInput">
+
+<div class="input-row">
+<div>
+<label>体重 kg</label>
+<input id="bodyWeightInput" type="number" step="0.1" placeholder="例 84.2">
+</div>
+<div>
+<label>体脂肪 %</label>
+<input id="bodyFatInput" type="number" step="0.1" placeholder="例 24.5">
+</div>
+<div>
+<label>筋肉量 kg</label>
+<input id="bodyMuscleInput" type="number" step="0.1" placeholder="例 55.0">
+</div>
+</div>
+
+<button class="save" onclick="saveBodyRecord()">身体記録を保存</button>
+
+<h3>身体記録の推移</h3>
+<select id="bodyGraphMetric" onchange="drawBodyGraph()">
+<option value="weight">体重</option>
+<option value="fat">体脂肪</option>
+<option value="muscle">筋肉量</option>
+</select>
+<canvas id="bodyGraph" width="700" height="260"></canvas>
+
+<h3>最近の身体記録</h3>
+<div id="bodyRecordArea"></div>
+</div>
+</section>
+
+<section class="card">
 <h2>直近の前回実績</h2>
 <div id="lastArea"></div>
 </section>
@@ -207,6 +245,7 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 
 <script>
 let workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
+let bodyRecords = JSON.parse(localStorage.getItem("bodyRecords") || "[]");
 let current = [];
 let selectedExercise = "レッグプレス";
 let currentTab = "all";
@@ -238,7 +277,12 @@ const parts = {
 
 document.addEventListener("DOMContentLoaded",()=>{
   normalizeWorkouts();
-  document.getElementById("dateInput").value = new Date().toISOString().slice(0,10);
+  normalizeBodyRecords();
+
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById("dateInput").value = today;
+  document.getElementById("bodyDateInput").value = today;
+
   makeExerciseButtons();
   setActiveInput("weightInput");
   statusText("アプリを読み込みました");
@@ -266,6 +310,13 @@ function getSelectedDateKey(){
   return `${m}/${d}`;
 }
 
+function getBodyDateKey(){
+  const value = document.getElementById("bodyDateInput").value;
+  if(!value) return "";
+  const [y,m,d] = value.split("-").map(Number);
+  return `${m}/${d}`;
+}
+
 function dateToNumber(dateText){
   const [m,d] = String(dateText).split("/").map(Number);
   return (m || 0) * 100 + (d || 0);
@@ -285,6 +336,10 @@ function sortWorkouts(){
   workouts.sort((a,b)=>dateToNumber(a.date)-dateToNumber(b.date));
 }
 
+function sortBodyRecords(){
+  bodyRecords.sort((a,b)=>dateToNumber(a.date)-dateToNumber(b.date));
+}
+
 function getLatestWorkout(){
   if(!workouts.length) return null;
   return [...workouts].sort((a,b)=>dateToNumber(a.date)-dateToNumber(b.date)).at(-1);
@@ -298,6 +353,14 @@ function getSortedDesc(){
   return [...workouts].sort((a,b)=>dateToNumber(b.date)-dateToNumber(a.date));
 }
 
+function getBodySortedAsc(){
+  return [...bodyRecords].sort((a,b)=>dateToNumber(a.date)-dateToNumber(b.date));
+}
+
+function getBodySortedDesc(){
+  return [...bodyRecords].sort((a,b)=>dateToNumber(b.date)-dateToNumber(a.date));
+}
+
 function normalizeWorkouts(){
   const merged = {};
   workouts.forEach(w=>{
@@ -309,6 +372,22 @@ function normalizeWorkouts(){
   workouts = Object.values(merged);
   sortWorkouts();
   localStorage.setItem("workouts", JSON.stringify(workouts));
+}
+
+function normalizeBodyRecords(){
+  const merged = {};
+  bodyRecords.forEach(r=>{
+    if(!r.date) return;
+    merged[r.date] = {
+      date:r.date,
+      weight:r.weight || "",
+      fat:r.fat || "",
+      muscle:r.muscle || ""
+    };
+  });
+  bodyRecords = Object.values(merged);
+  sortBodyRecords();
+  localStorage.setItem("bodyRecords", JSON.stringify(bodyRecords));
 }
 
 function makeExerciseButtons(){
@@ -470,6 +549,54 @@ function saveWorkout(){
   render();
 }
 
+function saveBodyRecord(){
+  const date = getBodyDateKey();
+  const weight = document.getElementById("bodyWeightInput").value;
+  const fat = document.getElementById("bodyFatInput").value;
+  const muscle = document.getElementById("bodyMuscleInput").value;
+
+  if(!date){
+    alert("日付を入力してください");
+    return;
+  }
+
+  if(!weight && !fat && !muscle){
+    alert("体重・体脂肪・筋肉量のいずれかを入力してください");
+    return;
+  }
+
+  const existing = bodyRecords.find(r=>r.date===date);
+
+  if(existing){
+    existing.weight = weight;
+    existing.fat = fat;
+    existing.muscle = muscle;
+    statusText(date+" の身体記録を更新しました");
+  }else{
+    bodyRecords.push({date, weight, fat, muscle});
+    statusText("身体記録を保存しました");
+  }
+
+  sortBodyRecords();
+  localStorage.setItem("bodyRecords", JSON.stringify(bodyRecords));
+
+  document.getElementById("bodyWeightInput").value = "";
+  document.getElementById("bodyFatInput").value = "";
+  document.getElementById("bodyMuscleInput").value = "";
+
+  renderBodyRecords();
+  drawBodyGraph();
+}
+
+function deleteBodyRecord(date){
+  if(!confirm("この身体記録を削除しますか？")) return;
+  bodyRecords = bodyRecords.filter(r=>r.date!==date);
+  localStorage.setItem("bodyRecords", JSON.stringify(bodyRecords));
+  renderBodyRecords();
+  drawBodyGraph();
+  statusText("身体記録を削除しました");
+}
+
 function copyWorkoutToPlan(date){
   const workout = workouts.find(w=>w.date===date);
   if(!workout) return;
@@ -488,14 +615,17 @@ function copyWorkoutToPlan(date){
 
 function render(){
   sortWorkouts();
+  sortBodyRecords();
   renderPlan();
   renderCurrent();
+  renderBodyRecords();
   renderLast();
   renderCopyText();
   renderVolume();
   renderHistory();
   renderGraphSelect();
   drawGraph();
+  drawBodyGraph();
   renderLastForSelected();
   setTab(currentTab,false);
 }
@@ -516,6 +646,27 @@ function renderCurrent(){
       </div>
     `).join("")
     : "<p>まだ実績が追加されていません。</p>";
+}
+
+function renderBodyRecords(){
+  const area = document.getElementById("bodyRecordArea");
+
+  if(!bodyRecords.length){
+    area.innerHTML = "<p>まだ身体記録がありません。</p>";
+    return;
+  }
+
+  area.innerHTML = getBodySortedDesc().map(r=>`
+    <div class="line">
+      <span>
+        <strong>${r.date}</strong><br>
+        体重：${r.weight || "-"}kg　
+        体脂肪：${r.fat || "-"}%　
+        筋肉量：${r.muscle || "-"}kg
+      </span>
+      <button class="small danger" onclick="deleteBodyRecord('${r.date}')">削除</button>
+    </div>
+  `).join("");
 }
 
 function removeCurrent(i){
@@ -786,9 +937,71 @@ function drawGraph(){
   });
 }
 
+function drawBodyGraph(){
+  const canvas = document.getElementById("bodyGraph");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const metric = document.getElementById("bodyGraphMetric").value;
+  const labels = {
+    weight:"体重",
+    fat:"体脂肪",
+    muscle:"筋肉量"
+  };
+  const units = {
+    weight:"kg",
+    fat:"%",
+    muscle:"kg"
+  };
+
+  const data = getBodySortedAsc()
+    .map(r=>({
+      date:r.date,
+      value:Number(r[metric])
+    }))
+    .filter(d=>!isNaN(d.value) && d.value > 0);
+
+  if(!data.length){
+    ctx.font = "14px sans-serif";
+    ctx.fillText("身体記録がまだありません",20,24);
+    return;
+  }
+
+  const max = Math.max(...data.map(d=>d.value));
+  const min = Math.min(...data.map(d=>d.value));
+  const range = max-min || 1;
+
+  ctx.font = "14px sans-serif";
+  ctx.fillText(labels[metric]+"の推移",20,24);
+
+  ctx.beginPath();
+
+  data.forEach((d,i)=>{
+    const x = 40 + i * (620 / Math.max(data.length-1,1));
+    const y = 220 - ((d.value-min)/range)*150;
+
+    if(i===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+
+    ctx.fillText(d.value+units[metric],x-18,y-8);
+    ctx.fillText(d.date,x-14,245);
+  });
+
+  ctx.stroke();
+
+  data.forEach((d,i)=>{
+    const x = 40 + i * (620 / Math.max(data.length-1,1));
+    const y = 220 - ((d.value-min)/range)*150;
+    ctx.beginPath();
+    ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fill();
+  });
+}
+
 function createBackup(){
   const data = {
     workouts,
+    bodyRecords,
     plan:localStorage.getItem("plan") || ""
   };
 
@@ -835,9 +1048,13 @@ function restoreBackup(){
     const decoded = decodeURIComponent(escape(atob(text.replace("WT-BACKUP:",""))));
     const data = JSON.parse(decoded);
     workouts = data.workouts || [];
+    bodyRecords = data.bodyRecords || [];
+
     normalizeWorkouts();
+    normalizeBodyRecords();
 
     localStorage.setItem("workouts", JSON.stringify(workouts));
+    localStorage.setItem("bodyRecords", JSON.stringify(bodyRecords));
     localStorage.setItem("plan", data.plan || "");
 
     render();
@@ -851,19 +1068,15 @@ function clearAll(){
   if(!confirm("すべて削除しますか？")) return;
 
   workouts = [];
+  bodyRecords = [];
   current = [];
 
   localStorage.removeItem("workouts");
+  localStorage.removeItem("bodyRecords");
   localStorage.removeItem("plan");
 
   render();
   statusText("すべて削除しました");
-}
-
-function metricLabel(name){
-  if(name==="アブベンチ") return "負荷";
-  if(name==="トレッドミル" || name==="バイク") return "負荷・傾斜";
-  return "重量";
 }
 
 function escapeHtml(text){
