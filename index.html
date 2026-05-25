@@ -121,6 +121,42 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 </section>
 
 <section class="card">
+<h2>直近の前回実績</h2>
+<div id="lastArea"></div>
+</section>
+
+<section class="card">
+<h2>種目別総ボリューム</h2>
+<div class="tabs">
+<button onclick="setVolumeRange('today')" id="range-today">今日</button>
+<button onclick="setVolumeRange('week')" id="range-week">今週</button>
+<button onclick="setVolumeRange('month')" id="range-month">今月</button>
+<button onclick="setVolumeRange('all')" id="range-all">全期間</button>
+</div>
+<div id="volumePeriod" class="period-box">対象期間：-</div>
+<div id="volumeArea"></div>
+</section>
+
+<section class="card">
+<h2>履歴</h2>
+<div class="tabs">
+<button onclick="setTab('all')" id="tab-all">全部</button>
+<button onclick="setTab('chest')" id="tab-chest">胸</button>
+<button onclick="setTab('back')" id="tab-back">背中</button>
+<button onclick="setTab('leg')" id="tab-leg">脚</button>
+<button onclick="setTab('core')" id="tab-core">腹</button>
+<button onclick="setTab('cardio')" id="tab-cardio">有酸素</button>
+</div>
+<div id="historyArea"></div>
+</section>
+
+<section class="card">
+<h2>推移グラフ</h2>
+<select id="graphExercise" onchange="drawGraph()"></select>
+<canvas id="graph" width="700" height="260"></canvas>
+</section>
+
+<section class="card">
 <h2 class="collapse-head" onclick="toggleCollapse('bodySection')">
 身体記録 <span>▼</span>
 </h2>
@@ -156,42 +192,6 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 <h3>最近の身体記録</h3>
 <div id="bodyRecordArea"></div>
 </div>
-</section>
-
-<section class="card">
-<h2>直近の前回実績</h2>
-<div id="lastArea"></div>
-</section>
-
-<section class="card">
-<h2>種目別総ボリューム</h2>
-<div class="tabs">
-<button onclick="setVolumeRange('today')" id="range-today">今日</button>
-<button onclick="setVolumeRange('week')" id="range-week">今週</button>
-<button onclick="setVolumeRange('month')" id="range-month">今月</button>
-<button onclick="setVolumeRange('all')" id="range-all">全期間</button>
-</div>
-<div id="volumePeriod" class="period-box">対象期間：-</div>
-<div id="volumeArea"></div>
-</section>
-
-<section class="card">
-<h2>履歴</h2>
-<div class="tabs">
-<button onclick="setTab('all')" id="tab-all">全部</button>
-<button onclick="setTab('chest')" id="tab-chest">胸</button>
-<button onclick="setTab('back')" id="tab-back">背中</button>
-<button onclick="setTab('leg')" id="tab-leg">脚</button>
-<button onclick="setTab('core')" id="tab-core">腹</button>
-<button onclick="setTab('cardio')" id="tab-cardio">有酸素</button>
-</div>
-<div id="historyArea"></div>
-</section>
-
-<section class="card">
-<h2>推移グラフ</h2>
-<select id="graphExercise" onchange="drawGraph()"></select>
-<canvas id="graph" width="700" height="260"></canvas>
 </section>
 
 <section class="card">
