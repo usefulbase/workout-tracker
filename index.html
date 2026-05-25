@@ -4,67 +4,341 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Workout Tracker</title>
+
 <meta name="theme-color" content="#111827">
+
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
 
 <style>
-:root{--bg:#f4f6f8;--card:#fff;--text:#222;--line:#e5e7eb;--soft:#f8fafc;--main:#2563eb}
-body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
-header{background:#111827;color:white;text-align:center;padding:20px}
-main{padding:16px;max-width:820px;margin:auto}
-.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 4px 14px #0001}
-h1{margin:0}
-h2{margin-top:0}
-textarea,input,button,select{width:100%;padding:12px;margin-top:8px;border-radius:12px;font-size:16px;box-sizing:border-box;border:1px solid var(--line)}
-textarea{min-height:100px}
-button{border:0;background:var(--main);color:white;font-weight:bold}
-button:active{transform:scale(.98)}
-.save{background:#16a34a}.danger{background:#dc2626}.gray{background:#64748b}
-.status{background:#ecfeff;color:#155e75;padding:12px;border-radius:12px;margin-bottom:16px;font-weight:bold}
-.memo{white-space:pre-wrap;background:var(--soft);padding:12px;border-radius:12px;margin-top:12px;line-height:1.8}
-.line{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:10px 0}
-.line-actions{display:flex;gap:6px;flex-shrink:0}
-.small{width:auto;padding:7px 10px;font-size:12px}
-.btn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-.btn-grid button{margin-top:0;background:#e5e7eb;color:#111827}
-.btn-grid button.active{background:var(--main);color:white}
-.input-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.input-row input.active{border:2px solid var(--main);background:#eff6ff}
-.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
-.keypad button{margin-top:0;background:#e5e7eb;color:#111827}
-.keypad .main{background:var(--main);color:white}.keypad .danger{background:#dc2626;color:white}.wide{grid-column:span 2}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
-.tabs button{margin-top:0;background:#e5e7eb;color:#111827}
-.tabs button.active{background:#111827;color:white}
-.history{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
-.history-head{background:#f1f5f9;padding:12px;font-weight:bold}
-.history-body{padding:12px;display:none}.open{display:block}
-.badge{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;margin-right:6px;color:white}
-.chest{background:#ef4444}.shoulder{background:#14b8a6}.back{background:#3b82f6}.leg{background:#22c55e}.core{background:#a855f7}.cardio{background:#f97316}.other{background:#64748b}
-canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;margin-top:10px}
-.volume-line{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0}
-.period-box{background:#f1f5f9;border-radius:12px;padding:12px;margin:8px 0 12px;font-weight:bold;color:#334155}
-.collapse-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin:0}
-.collapse-body{display:none;margin-top:12px}
-.collapse-body.open{display:block}
+:root{
+  --bg:#f4f6f8;
+  --card:#fff;
+  --text:#222;
+  --line:#e5e7eb;
+  --soft:#f8fafc;
+  --main:#2563eb;
+}
+
+body{
+  margin:0;
+  font-family:system-ui;
+  background:var(--bg);
+  color:var(--text);
+}
+
+header{
+  background:#111827;
+  color:white;
+  text-align:center;
+  padding:20px;
+}
+
+main{
+  padding:16px;
+  max-width:820px;
+  margin:auto;
+}
+
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 4px 14px #0001;
+}
+
+h1{
+  margin:0;
+}
+
+h2{
+  margin-top:0;
+}
+
+textarea,
+input,
+button,
+select{
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  border-radius:12px;
+  font-size:16px;
+  box-sizing:border-box;
+  border:1px solid var(--line);
+}
+
+textarea{
+  min-height:100px;
+}
+
+button{
+  border:0;
+  background:var(--main);
+  color:white;
+  font-weight:bold;
+}
+
+button:active{
+  transform:scale(.98);
+}
+
+.save{
+  background:#16a34a;
+}
+
+.danger{
+  background:#dc2626;
+}
+
+.gray{
+  background:#64748b;
+}
+
+.status{
+  background:#ecfeff;
+  color:#155e75;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:16px;
+  font-weight:bold;
+}
+
+.memo{
+  white-space:pre-wrap;
+  background:var(--soft);
+  padding:12px;
+  border-radius:12px;
+  margin-top:12px;
+  line-height:1.8;
+}
+
+.line{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  border-bottom:1px solid var(--line);
+  padding:10px 0;
+}
+
+.line-actions{
+  display:flex;
+  gap:6px;
+  flex-shrink:0;
+}
+
+.small{
+  width:auto;
+  padding:7px 10px;
+  font-size:12px;
+}
+
+.btn-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:8px;
+}
+
+.btn-grid button{
+  margin-top:0;
+  background:#e5e7eb;
+  color:#111827;
+}
+
+.btn-grid button.active{
+  background:var(--main);
+  color:white;
+}
+
+.input-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+
+.input-row input.active{
+  border:2px solid var(--main);
+  background:#eff6ff;
+}
+
+.keypad{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+
+.keypad button{
+  margin-top:0;
+  background:#e5e7eb;
+  color:#111827;
+}
+
+.keypad .main{
+  background:var(--main);
+  color:white;
+}
+
+.keypad .danger{
+  background:#dc2626;
+  color:white;
+}
+
+.wide{
+  grid-column:span 2;
+}
+
+.tabs{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.tabs button{
+  margin-top:0;
+  background:#e5e7eb;
+  color:#111827;
+}
+
+.tabs button.active{
+  background:#111827;
+  color:white;
+}
+
+.history{
+  border:1px solid var(--line);
+  border-radius:12px;
+  margin-bottom:10px;
+  overflow:hidden;
+}
+
+.history-head{
+  background:#f1f5f9;
+  padding:12px;
+  font-weight:bold;
+}
+
+.history-body{
+  padding:12px;
+  display:none;
+}
+
+.open{
+  display:block;
+}
+
+.badge{
+  display:inline-block;
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  margin-right:6px;
+  color:white;
+}
+
+.chest{
+  background:#ef4444;
+}
+
+.shoulder{
+  background:#14b8a6;
+}
+
+.back{
+  background:#3b82f6;
+}
+
+.leg{
+  background:#22c55e;
+}
+
+.core{
+  background:#a855f7;
+}
+
+.cardio{
+  background:#f97316;
+}
+
+.other{
+  background:#64748b;
+}
+
+canvas{
+  width:100%;
+  height:220px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  margin-top:10px;
+}
+
+.volume-line{
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line);
+  padding:10px 0;
+}
+
+.period-box{
+  background:#f1f5f9;
+  border-radius:12px;
+  padding:12px;
+  margin:8px 0 12px;
+  font-weight:bold;
+  color:#334155;
+}
+
+.collapse-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  margin:0;
+}
+
+.collapse-body{
+  display:none;
+  margin-top:12px;
+}
+
+.collapse-body.open{
+  display:block;
+}
 </style>
 </head>
 
 <body>
+
 <header>
 <h1>Workout Tracker</h1>
 </header>
 
 <main>
-<div id="status" class="status">読み込み中...</div>
+
+<div id="status" class="status">
+読み込み中...
+</div>
 
 <section class="card">
 <h2>今日の予定メモ</h2>
-<textarea id="planInput" placeholder="例&#10;5/24予定&#10;レッグプレス50×12×2"></textarea>
-<button onclick="savePlan()">予定メモを保存</button>
-<button class="save" onclick="planToCurrent()">予定を実績入力へ追加</button>
+
+<textarea
+  id="planInput"
+  placeholder="例&#10;5/24予定&#10;レッグプレス50×12×2"
+></textarea>
+
+<button onclick="savePlan()">
+予定メモを保存
+</button>
+
+<button class="save" onclick="planToCurrent()">
+予定を実績入力へ追加
+</button>
+
 <div id="planArea"></div>
 </section>
 
@@ -75,27 +349,51 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 <input type="date" id="dateInput">
 
 <label>種目</label>
-<div class="btn-grid" id="exerciseButtons"></div>
-<input id="customName" placeholder="その他の種目名">
 
-<div id="lastForSelected" class="memo">種目を選ぶと前回実績を表示します。</div>
+<div class="btn-grid" id="exerciseButtons"></div>
+
+<input
+  id="customName"
+  placeholder="その他の種目名"
+>
+
+<div id="lastForSelected" class="memo">
+種目を選ぶと前回実績を表示します。
+</div>
 
 <div class="input-row">
+
 <div>
 <label id="labelWeight">重量・傾斜</label>
-<input id="weightInput" readonly onclick="setActiveInput('weightInput')">
+<input
+  id="weightInput"
+  readonly
+  onclick="setActiveInput('weightInput')"
+>
 </div>
+
 <div>
 <label id="labelReps">回数・速度</label>
-<input id="repsInput" readonly onclick="setActiveInput('repsInput')">
+<input
+  id="repsInput"
+  readonly
+  onclick="setActiveInput('repsInput')"
+>
 </div>
+
 <div>
 <label id="labelSets">セット・分</label>
-<input id="setsInput" readonly onclick="setActiveInput('setsInput')">
+<input
+  id="setsInput"
+  readonly
+  onclick="setActiveInput('setsInput')"
+>
 </div>
+
 </div>
 
 <div class="keypad">
+
 <button onclick="keyInput('7')">7</button>
 <button onclick="keyInput('8')">8</button>
 <button onclick="keyInput('9')">9</button>
@@ -113,12 +411,23 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 
 <button onclick="keyInput('0')">0</button>
 <button onclick="keyInput('00')">00</button>
-<button onclick="moveNext()" class="main wide">次へ</button>
+
+<button onclick="moveNext()" class="main wide">
+次へ
+</button>
+
 </div>
 
-<button id="addExerciseBtn" onclick="addExercise()">実績に追加</button>
+<button id="addExerciseBtn" onclick="addExercise()">
+実績に追加
+</button>
+
 <div id="currentArea"></div>
-<button class="save" onclick="saveWorkout()">今日の実績を保存</button>
+
+<button class="save" onclick="saveWorkout()">
+今日の実績を保存
+</button>
+
 </section>
 
 <section class="card">
@@ -128,90 +437,213 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 
 <section class="card">
 <h2>種目別総ボリューム</h2>
+
 <div class="tabs">
-<button onclick="setVolumeRange('today')" id="range-today">今日</button>
-<button onclick="setVolumeRange('week')" id="range-week">今週</button>
-<button onclick="setVolumeRange('month')" id="range-month">今月</button>
-<button onclick="setVolumeRange('all')" id="range-all">全期間</button>
+
+<button
+  onclick="setVolumeRange('today')"
+  id="range-today"
+>
+今日
+</button>
+
+<button
+  onclick="setVolumeRange('week')"
+  id="range-week"
+>
+今週
+</button>
+
+<button
+  onclick="setVolumeRange('month')"
+  id="range-month"
+>
+今月
+</button>
+
+<button
+  onclick="setVolumeRange('all')"
+  id="range-all"
+>
+全期間
+</button>
+
 </div>
-<div id="volumePeriod" class="period-box">対象期間：-</div>
+
+<div id="volumePeriod" class="period-box">
+対象期間：-
+</div>
+
 <div id="volumeArea"></div>
 </section>
 
 <section class="card">
 <h2>履歴</h2>
+
 <div class="tabs">
-<button onclick="setTab('all')" id="tab-all">全部</button>
-<button onclick="setTab('chest')" id="tab-chest">胸</button>
-<button onclick="setTab('shoulder')" id="tab-shoulder">肩</button>
-<button onclick="setTab('back')" id="tab-back">背中</button>
-<button onclick="setTab('leg')" id="tab-leg">脚</button>
-<button onclick="setTab('core')" id="tab-core">腹</button>
-<button onclick="setTab('cardio')" id="tab-cardio">有酸素</button>
+
+<button onclick="setTab('all')" id="tab-all">
+全部
+</button>
+
+<button onclick="setTab('chest')" id="tab-chest">
+胸
+</button>
+
+<button onclick="setTab('shoulder')" id="tab-shoulder">
+肩
+</button>
+
+<button onclick="setTab('back')" id="tab-back">
+背中
+</button>
+
+<button onclick="setTab('leg')" id="tab-leg">
+脚
+</button>
+
+<button onclick="setTab('core')" id="tab-core">
+腹
+</button>
+
+<button onclick="setTab('cardio')" id="tab-cardio">
+有酸素
+</button>
+
 </div>
+
 <div id="historyArea"></div>
 </section>
 
 <section class="card">
 <h2>推移グラフ</h2>
+
 <select id="graphExercise" onchange="drawGraph()"></select>
-<canvas id="graph" width="700" height="260"></canvas>
+
+<canvas
+  id="graph"
+  width="700"
+  height="260"
+></canvas>
+
 </section>
 
 <section class="card">
-<h2 class="collapse-head" onclick="toggleCollapse('bodySection')">
+
+<h2
+  class="collapse-head"
+  onclick="toggleCollapse('bodySection')"
+>
 身体記録 <span>▼</span>
 </h2>
+
 <div id="bodySection" class="collapse-body">
+
 <label>日付</label>
-<input type="date" id="bodyDateInput">
+
+<input
+  type="date"
+  id="bodyDateInput"
+>
 
 <div class="input-row">
+
 <div>
 <label>体重 kg</label>
-<input id="bodyWeightInput" type="number" step="0.1" placeholder="例 84.2">
+
+<input
+  id="bodyWeightInput"
+  type="number"
+  step="0.1"
+  placeholder="例 84.2"
+>
 </div>
+
 <div>
 <label>体脂肪 %</label>
-<input id="bodyFatInput" type="number" step="0.1" placeholder="例 24.5">
+
+<input
+  id="bodyFatInput"
+  type="number"
+  step="0.1"
+  placeholder="例 24.5"
+>
 </div>
+
 <div>
 <label>筋肉量 kg</label>
-<input id="bodyMuscleInput" type="number" step="0.1" placeholder="例 55.0">
-</div>
+
+<input
+  id="bodyMuscleInput"
+  type="number"
+  step="0.1"
+  placeholder="例 55.0"
+>
 </div>
 
-<button class="save" onclick="saveBodyRecord()">身体記録を保存</button>
+</div>
+
+<button class="save" onclick="saveBodyRecord()">
+身体記録を保存
+</button>
 
 <h3>身体記録の推移</h3>
-<select id="bodyGraphMetric" onchange="drawBodyGraph()">
+
+<select
+  id="bodyGraphMetric"
+  onchange="drawBodyGraph()"
+>
 <option value="weight">体重</option>
 <option value="fat">体脂肪</option>
 <option value="muscle">筋肉量</option>
 </select>
-<canvas id="bodyGraph" width="700" height="260"></canvas>
+
+<canvas
+  id="bodyGraph"
+  width="700"
+  height="260"
+></canvas>
 
 <h3>最近の身体記録</h3>
+
 <div id="bodyRecordArea"></div>
+
 </div>
 </section>
 
 <section class="card">
-<h2 class="collapse-head" onclick="toggleCollapse('copySection')">
+
+<h2
+  class="collapse-head"
+  onclick="toggleCollapse('copySection')"
+>
 前回実績コピー用 <span>▼</span>
 </h2>
+
 <div id="copySection" class="collapse-body">
+
 <textarea id="copyText" readonly></textarea>
-<button onclick="copyLastWorkout()">前回実績をコピー</button>
+
+<button onclick="copyLastWorkout()">
+前回実績をコピー
+</button>
+
 </div>
 </section>
 
 <section class="card">
-<h2 class="collapse-head" onclick="toggleCollapse('backupSection')">
+
+<h2
+  class="collapse-head"
+  onclick="toggleCollapse('backupSection')"
+>
 バックアップ <span>▼</span>
 </h2>
+
 <div id="backupSection" class="collapse-body">
-<div class="memo">【バックアップの使い方】
+
+<div class="memo">
+【バックアップの使い方】
 
 ①「バックアップ作成」を押す
 
@@ -224,39 +656,76 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 機種変更やデータ削除後は、
 
 保存しておいた文字列を貼り付けて
-「バックアップ復元」を押してください。</div>
+「バックアップ復元」を押してください。
+</div>
 
-<div id="backupTime" class="memo">まだバックアップしていません。</div>
-<button class="gray" onclick="createBackup()">バックアップ作成</button>
-<button onclick="copyBackup()">バックアップをコピー</button>
-<button onclick="shareBackup()">バックアップを共有</button>
+<div id="backupTime" class="memo">
+まだバックアップしていません。
+</div>
+
+<button class="gray" onclick="createBackup()">
+バックアップ作成
+</button>
+
+<button onclick="copyBackup()">
+バックアップをコピー
+</button>
+
+<button onclick="shareBackup()">
+バックアップを共有
+</button>
+
 <textarea id="backupArea"></textarea>
-<button onclick="restoreBackup()">バックアップ復元</button>
+
+<button onclick="restoreBackup()">
+バックアップ復元
+</button>
+
 </div>
 </section>
 
 <section class="card">
-<h2 class="collapse-head" onclick="toggleCollapse('dataSection')">
+
+<h2
+  class="collapse-head"
+  onclick="toggleCollapse('dataSection')"
+>
 データ管理 <span>▼</span>
 </h2>
+
 <div id="dataSection" class="collapse-body">
-<button class="danger" onclick="clearAll()">全データ削除</button>
+
+<button class="danger" onclick="clearAll()">
+全データ削除
+</button>
+
 </div>
 </section>
+
 </main>
 
 <script>
-let workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
-let bodyRecords = JSON.parse(localStorage.getItem("bodyRecords") || "[]");
+
+let workouts =
+  JSON.parse(localStorage.getItem("workouts") || "[]");
+
+let bodyRecords =
+  JSON.parse(localStorage.getItem("bodyRecords") || "[]");
 
 let current = [];
+
 let selectedExercise = "レッグプレス";
+
 let currentTab = "all";
+
 let activeInput = "weightInput";
+
 let volumeRange = "all";
+
 let editingIndex = -1;
 
 const exercises = [
+
 "トレッドミル",
 "バイク",
 "レッグプレス",
@@ -267,9 +736,11 @@ const exercises = [
 "アダクション",
 "アブベンチ",
 "その他"
+
 ];
 
 const parts = {
+
 "チェストプレス":"chest",
 "ショルダープレス":"shoulder",
 "ラットプルダウン":"back",
@@ -279,34 +750,46 @@ const parts = {
 "アブベンチ":"core",
 "トレッドミル":"cardio",
 "バイク":"cardio"
+
 };
 
 document.addEventListener("DOMContentLoaded",()=>{
+
   normalizeWorkouts();
   normalizeBodyRecords();
 
-  const today = new Date().toISOString().slice(0,10);
+  const today =
+    new Date().toISOString().slice(0,10);
 
   document.getElementById("dateInput").value = today;
+
   document.getElementById("bodyDateInput").value = today;
 
   makeExerciseButtons();
+
   setActiveInput("weightInput");
 
   statusText("アプリを読み込みました");
 
   render();
+
 });
 
 function statusText(t){
+
   document.getElementById("status").textContent = t;
+
 }
 
 function toggleCollapse(id){
-  document.getElementById(id).classList.toggle("open");
+
+  document.getElementById(id)
+    .classList.toggle("open");
+
 }
 
 function badge(name){
+
   const p = parts[name] || "other";
 
   const label = {
@@ -319,60 +802,91 @@ function badge(name){
     other:"他"
   }[p];
 
-  return `<span class="badge ${p}">${label}</span>`;
+  return `
+    <span class="badge ${p}">
+      ${label}
+    </span>
+  `;
 }
 
 function getSelectedDateKey(){
-  const value = document.getElementById("dateInput").value;
+
+  const value =
+    document.getElementById("dateInput").value;
 
   if(!value) return "";
 
-  const [y,m,d] = value.split("-").map(Number);
+  const [y,m,d] =
+    value.split("-").map(Number);
 
   return `${m}/${d}`;
+
 }
 
 function getBodyDateKey(){
-  const value = document.getElementById("bodyDateInput").value;
+
+  const value =
+    document.getElementById("bodyDateInput").value;
 
   if(!value) return "";
 
-  const [y,m,d] = value.split("-").map(Number);
+  const [y,m,d] =
+    value.split("-").map(Number);
 
   return `${m}/${d}`;
+
 }
 
 function dateToNumber(dateText){
-  const [m,d] = String(dateText).split("/").map(Number);
+
+  const [m,d] =
+    String(dateText).split("/").map(Number);
 
   return (m || 0) * 100 + (d || 0);
+
 }
 
 function dateKeyToDate(dateText){
+
   const now = new Date();
 
-  const [m,d] = String(dateText).split("/").map(Number);
+  const [m,d] =
+    String(dateText).split("/").map(Number);
 
-  return new Date(now.getFullYear(), (m || 1)-1, d || 1);
+  return new Date(
+    now.getFullYear(),
+    (m || 1)-1,
+    d || 1
+  );
+
 }
 
 function formatDateObj(date){
+
   return `${date.getMonth()+1}/${date.getDate()}`;
+
 }
 
 function sortWorkouts(){
-  workouts.sort((a,b)=>
-    dateToNumber(a.date)-dateToNumber(b.date)
+
+  workouts.sort(
+    (a,b)=>
+      dateToNumber(a.date)-dateToNumber(b.date)
   );
+
 }
 
 function sortBodyRecords(){
-  bodyRecords.sort((a,b)=>
-    dateToNumber(a.date)-dateToNumber(b.date)
+
+  bodyRecords.sort(
+    (a,b)=>
+      dateToNumber(a.date)-dateToNumber(b.date)
   );
+
 }
 
 function getLatestWorkout(){
+
   if(!workouts.length) return null;
 
   return [...workouts]
@@ -380,34 +894,43 @@ function getLatestWorkout(){
       dateToNumber(a.date)-dateToNumber(b.date)
     )
     .at(-1);
+
 }
 
 function getSortedAsc(){
+
   return [...workouts]
     .sort((a,b)=>
       dateToNumber(a.date)-dateToNumber(b.date)
     );
+
 }
 
 function getSortedDesc(){
+
   return [...workouts]
     .sort((a,b)=>
       dateToNumber(b.date)-dateToNumber(a.date)
     );
+
 }
 
 function getBodySortedAsc(){
+
   return [...bodyRecords]
     .sort((a,b)=>
       dateToNumber(a.date)-dateToNumber(b.date)
     );
+
 }
 
 function getBodySortedDesc(){
+
   return [...bodyRecords]
     .sort((a,b)=>
       dateToNumber(b.date)-dateToNumber(a.date)
     );
+
 }
 
 function normalizeWorkouts(){
@@ -425,6 +948,7 @@ function normalizeWorkouts(){
 
     merged[w.date].exercises =
       merged[w.date].exercises.concat(w.exercises || []);
+
   });
 
   workouts = Object.values(merged);
@@ -435,6 +959,7 @@ function normalizeWorkouts(){
     "workouts",
     JSON.stringify(workouts)
   );
+
 }
 
 function normalizeBodyRecords(){
@@ -451,6 +976,7 @@ function normalizeBodyRecords(){
       fat:r.fat || "",
       muscle:r.muscle || ""
     };
+
   });
 
   bodyRecords = Object.values(merged);
@@ -461,6 +987,7 @@ function normalizeBodyRecords(){
     "bodyRecords",
     JSON.stringify(bodyRecords)
   );
+
 }
 
 function makeExerciseButtons(){
@@ -474,6 +1001,7 @@ function makeExerciseButtons(){
     ).join("");
 
   selectExercise(selectedExercise);
+
 }
 
 function selectExercise(name){
@@ -488,11 +1016,13 @@ function selectExercise(name){
     if(b){
       b.classList.toggle("active", x===name);
     }
+
   });
 
   updateLabels();
 
   renderLastForSelected();
+
 }
 
 function updateLabels(){
@@ -506,29 +1036,44 @@ function updateLabels(){
 
   if(cardio){
 
-    document.getElementById("labelWeight").textContent = "負荷・傾斜";
-    document.getElementById("labelReps").textContent = "速度";
-    document.getElementById("labelSets").textContent = "分";
-  }
-  else if(abBench){
+    document.getElementById("labelWeight").textContent =
+      "負荷・傾斜";
 
-    document.getElementById("labelWeight").textContent = "負荷";
-    document.getElementById("labelReps").textContent = "回数";
-    document.getElementById("labelSets").textContent = "セット";
-  }
-  else{
+    document.getElementById("labelReps").textContent =
+      "速度";
 
-    document.getElementById("labelWeight").textContent = "重量";
-    document.getElementById("labelReps").textContent = "回数";
-    document.getElementById("labelSets").textContent = "セット";
+    document.getElementById("labelSets").textContent =
+      "分";
+
+  }else if(abBench){
+
+    document.getElementById("labelWeight").textContent =
+      "負荷";
+
+    document.getElementById("labelReps").textContent =
+      "回数";
+
+    document.getElementById("labelSets").textContent =
+      "セット";
+
+  }else{
+
+    document.getElementById("labelWeight").textContent =
+      "重量";
+
+    document.getElementById("labelReps").textContent =
+      "回数";
+
+    document.getElementById("labelSets").textContent =
+      "セット";
+
   }
+
 }
 
 function metricLabel(name){
 
-  if(name==="アブベンチ"){
-    return "負荷";
-  }
+  if(name==="アブベンチ") return "負荷";
 
   if(
     name==="トレッドミル" ||
@@ -538,19 +1083,21 @@ function metricLabel(name){
   }
 
   return "重量";
+
 }
 
 function setActiveInput(id){
 
   activeInput = id;
 
-  ["weightInput","repsInput","setsInput"]
-    .forEach(x=>{
+  ["weightInput","repsInput","setsInput"].forEach(x=>{
 
-      document
-        .getElementById(x)
-        .classList.toggle("active", x===id);
-    });
+    document
+      .getElementById(x)
+      .classList.toggle("active", x===id);
+
+  });
+
 }
 
 function keyInput(v){
@@ -561,6 +1108,7 @@ function keyInput(v){
   if(v==="." && input.value.includes(".")) return;
 
   input.value += v;
+
 }
 
 function keyBack(){
@@ -570,23 +1118,25 @@ function keyBack(){
 
   input.value =
     input.value.slice(0,-1);
+
 }
 
 function keyClear(){
+
   document.getElementById(activeInput).value = "";
+
 }
 
 function moveNext(){
 
   if(activeInput==="weightInput"){
     setActiveInput("repsInput");
-  }
-  else if(activeInput==="repsInput"){
+  }else if(activeInput==="repsInput"){
     setActiveInput("setsInput");
-  }
-  else{
+  }else{
     setActiveInput("weightInput");
   }
+
 }
 
 function savePlan(){
@@ -608,6 +1158,7 @@ function savePlan(){
   statusText("予定メモを保存しました");
 
   render();
+
 }
 
 function planToCurrent(){
@@ -632,18 +1183,19 @@ function planToCurrent(){
   renderCurrent();
 
   statusText("予定を実績入力へ追加しました");
+
 }
 
 function parseLines(text){
 
-  return text.split("\n")
+  return text
+    .split("\n")
     .map(s=>s.trim())
     .filter(Boolean)
     .map(line=>{
 
-      const m = line.match(
-        /^(.+?)(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)$/
-      );
+      const m =
+        line.match(/^(.+?)(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)$/);
 
       if(!m) return null;
 
@@ -653,8 +1205,10 @@ function parseLines(text){
         reps:m[3],
         sets:m[4]
       };
+
     })
     .filter(Boolean);
+
 }
 
 function addExercise(){
@@ -701,24 +1255,25 @@ function addExercise(){
       "実績に追加";
 
     statusText("実績を修正しました");
-  }
-  else{
+
+  }else{
 
     current.push(item);
 
     statusText("実績に追加しました");
+
   }
 
-  ["weightInput","repsInput","setsInput"]
-    .forEach(id=>{
-      document.getElementById(id).value = "";
-    });
+  ["weightInput","repsInput","setsInput"].forEach(id=>{
+    document.getElementById(id).value = "";
+  });
 
   document.getElementById("customName").value = "";
 
   setActiveInput("weightInput");
 
   renderCurrent();
+
 }
 
 function editCurrent(i){
@@ -732,12 +1287,13 @@ function editCurrent(i){
     selectExercise(ex.name);
 
     document.getElementById("customName").value = "";
-  }
-  else{
+
+  }else{
 
     selectExercise("その他");
 
     document.getElementById("customName").value = ex.name;
+
   }
 
   document.getElementById("weightInput").value = ex.weight;
@@ -750,40 +1306,68 @@ function editCurrent(i){
   setActiveInput("weightInput");
 
   statusText("修正する内容を入力欄に戻しました");
+
 }
 
 function saveWorkout(){
+
   if(current.length===0){
     alert("先に実績に追加してください");
     return;
   }
 
   const date = getSelectedDateKey();
-  const existing = workouts.find(w=>w.date===date);
+
+  const existing =
+    workouts.find(w=>w.date===date);
 
   if(existing){
-    existing.exercises = existing.exercises.concat(current);
+
+    existing.exercises =
+      existing.exercises.concat(current);
+
     statusText(date+" の実績に追加保存しました");
+
   }else{
-    workouts.push({date, exercises:current});
+
+    workouts.push({
+      date,
+      exercises:current
+    });
+
     statusText("実績を保存しました");
+
   }
 
   sortWorkouts();
-  localStorage.setItem("workouts", JSON.stringify(workouts));
+
+  localStorage.setItem(
+    "workouts",
+    JSON.stringify(workouts)
+  );
 
   current = [];
   editingIndex = -1;
-  document.getElementById("addExerciseBtn").textContent = "実績に追加";
+
+  document.getElementById("addExerciseBtn").textContent =
+    "実績に追加";
 
   render();
+
 }
 
 function saveBodyRecord(){
+
   const date = getBodyDateKey();
-  const weight = document.getElementById("bodyWeightInput").value;
-  const fat = document.getElementById("bodyFatInput").value;
-  const muscle = document.getElementById("bodyMuscleInput").value;
+
+  const weight =
+    document.getElementById("bodyWeightInput").value;
+
+  const fat =
+    document.getElementById("bodyFatInput").value;
+
+  const muscle =
+    document.getElementById("bodyMuscleInput").value;
 
   if(!date){
     alert("日付を入力してください");
@@ -795,20 +1379,36 @@ function saveBodyRecord(){
     return;
   }
 
-  const existing = bodyRecords.find(r=>r.date===date);
+  const existing =
+    bodyRecords.find(r=>r.date===date);
 
   if(existing){
+
     existing.weight = weight;
     existing.fat = fat;
     existing.muscle = muscle;
+
     statusText(date+" の身体記録を更新しました");
+
   }else{
-    bodyRecords.push({date, weight, fat, muscle});
+
+    bodyRecords.push({
+      date,
+      weight,
+      fat,
+      muscle
+    });
+
     statusText("身体記録を保存しました");
+
   }
 
   sortBodyRecords();
-  localStorage.setItem("bodyRecords", JSON.stringify(bodyRecords));
+
+  localStorage.setItem(
+    "bodyRecords",
+    JSON.stringify(bodyRecords)
+  );
 
   document.getElementById("bodyWeightInput").value = "";
   document.getElementById("bodyFatInput").value = "";
@@ -816,38 +1416,61 @@ function saveBodyRecord(){
 
   renderBodyRecords();
   drawBodyGraph();
+
 }
 
 function deleteBodyRecord(date){
+
   if(!confirm("この身体記録を削除しますか？")) return;
 
-  bodyRecords = bodyRecords.filter(r=>r.date!==date);
-  localStorage.setItem("bodyRecords", JSON.stringify(bodyRecords));
+  bodyRecords =
+    bodyRecords.filter(r=>r.date!==date);
+
+  localStorage.setItem(
+    "bodyRecords",
+    JSON.stringify(bodyRecords)
+  );
 
   renderBodyRecords();
   drawBodyGraph();
+
   statusText("身体記録を削除しました");
+
 }
 
 function copyWorkoutToPlan(date){
-  const workout = workouts.find(w=>w.date===date);
+
+  const workout =
+    workouts.find(w=>w.date===date);
+
   if(!workout) return;
 
   const text =
     `${date}のメニュー\n` +
-    workout.exercises.map(ex =>
-      `${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`
-    ).join("\n");
+    workout.exercises
+      .map(ex=>
+        `${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`
+      )
+      .join("\n");
 
   localStorage.setItem("plan", text);
+
   renderPlan();
-  window.scrollTo({top:0, behavior:"smooth"});
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
   statusText("予定メモへ入力しました");
+
 }
 
 function render(){
+
   sortWorkouts();
   sortBodyRecords();
+
   renderPlan();
   renderCurrent();
   renderBodyRecords();
@@ -856,173 +1479,329 @@ function render(){
   renderVolume();
   renderHistory();
   renderGraphSelect();
+
   drawGraph();
   drawBodyGraph();
+
   renderLastForSelected();
+
   setTab(currentTab,false);
+
 }
 
 function renderPlan(){
-  const text = localStorage.getItem("plan");
 
-  document.getElementById("planArea").innerHTML = text
-    ? `<div class="memo">${escapeHtml(text)}</div>`
-    : "<p>まだ予定メモはありません。</p>";
+  const text =
+    localStorage.getItem("plan");
+
+  document.getElementById("planArea").innerHTML =
+    text
+      ? `<div class="memo">${escapeHtml(text)}</div>`
+      : "<p>まだ予定メモはありません。</p>";
+
 }
 
 function renderCurrent(){
-  document.getElementById("currentArea").innerHTML = current.length
-    ? current.map((ex,i)=>`
-      <div class="line">
-        <span>${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span>
-        <div class="line-actions">
-          <button class="small gray" onclick="editCurrent(${i})">修正</button>
-          <button class="small danger" onclick="removeCurrent(${i})">削除</button>
+
+  document.getElementById("currentArea").innerHTML =
+    current.length
+      ? current.map((ex,i)=>`
+        <div class="line">
+          <span>
+            ${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}
+          </span>
+
+          <div class="line-actions">
+            <button
+              class="small gray"
+              onclick="editCurrent(${i})"
+            >
+              修正
+            </button>
+
+            <button
+              class="small danger"
+              onclick="removeCurrent(${i})"
+            >
+              削除
+            </button>
+          </div>
         </div>
-      </div>
-    `).join("")
-    : "<p>まだ実績が追加されていません。</p>";
+      `).join("")
+      : "<p>まだ実績が追加されていません。</p>";
+
 }
 
 function renderBodyRecords(){
-  const area = document.getElementById("bodyRecordArea");
+
+  const area =
+    document.getElementById("bodyRecordArea");
 
   if(!bodyRecords.length){
-    area.innerHTML = "<p>まだ身体記録がありません。</p>";
-    return;
-  }
 
-  area.innerHTML = getBodySortedDesc().map(r=>`
-    <div class="line">
-      <span>
-        <strong>${r.date}</strong><br>
-        体重：${r.weight || "-"}kg　
-        体脂肪：${r.fat || "-"}%　
-        筋肉量：${r.muscle || "-"}kg
-      </span>
-      <button class="small danger" onclick="deleteBodyRecord('${r.date}')">削除</button>
-    </div>
-  `).join("");
-}
+    area.innerHTML =
+      "<p>まだ身体記録がありません。</p>";
 
-function removeCurrent(i){
-  current.splice(i,1);
-
-  if(editingIndex === i){
-    editingIndex = -1;
-    document.getElementById("addExerciseBtn").textContent = "実績に追加";
-  }
-
-  renderCurrent();
-}
-
-function renderLast(){
-  const area = document.getElementById("lastArea");
-  const w = getLatestWorkout();
-
-  if(!w){
-    area.innerHTML = "<p>まだ実績がありません。</p>";
     return;
   }
 
   area.innerHTML =
-    `<strong>${w.date}</strong>`+
-    w.exercises.map(ex=>`
-      <div class="line">
-        <span>${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span>
-      </div>
-    `).join("");
+    getBodySortedDesc()
+      .map(r=>`
+        <div class="line">
+          <span>
+            <strong>${r.date}</strong><br>
+            体重：${r.weight || "-"}kg　
+            体脂肪：${r.fat || "-"}%　
+            筋肉量：${r.muscle || "-"}kg
+          </span>
+
+          <button
+            class="small danger"
+            onclick="deleteBodyRecord('${r.date}')"
+          >
+            削除
+          </button>
+        </div>
+      `)
+      .join("");
+
+}
+
+function removeCurrent(i){
+
+  current.splice(i,1);
+
+  if(editingIndex === i){
+
+    editingIndex = -1;
+
+    document.getElementById("addExerciseBtn").textContent =
+      "実績に追加";
+
+  }
+
+  renderCurrent();
+
+}
+
+function renderLast(){
+
+  const area =
+    document.getElementById("lastArea");
+
+  const w = getLatestWorkout();
+
+  if(!w){
+
+    area.innerHTML =
+      "<p>まだ実績がありません。</p>";
+
+    return;
+  }
+
+  area.innerHTML =
+    `<strong>${w.date}</strong>` +
+    w.exercises
+      .map(ex=>`
+        <div class="line">
+          <span>
+            ${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}
+          </span>
+        </div>
+      `)
+      .join("");
+
 }
 
 function renderLastForSelected(){
-  const area = document.getElementById("lastForSelected");
+
+  const area =
+    document.getElementById("lastForSelected");
+
   const sorted = getSortedDesc();
 
   for(const w of sorted){
-    const found = w.exercises.filter(ex=>ex.name===selectedExercise);
+
+    const found =
+      w.exercises.filter(ex=>ex.name===selectedExercise);
 
     if(found.length){
+
       area.innerHTML =
         `前回の${selectedExercise}：\n`+
-        found.map(ex=>`${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`).join("\n");
+        found
+          .map(ex=>
+            `${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`
+          )
+          .join("\n");
+
       return;
     }
   }
 
-  area.innerHTML = `${selectedExercise} の前回実績はまだありません。`;
+  area.innerHTML =
+    `${selectedExercise} の前回実績はまだありません。`;
+
 }
 
 function renderCopyText(){
-  const t = document.getElementById("copyText");
+
+  const t =
+    document.getElementById("copyText");
+
   const w = getLatestWorkout();
 
   if(!w){
+
     t.value = "";
+
     return;
   }
 
   t.value =
     `${w.date}\n`+
-    w.exercises.map(ex=>`${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`).join("\n");
+    w.exercises
+      .map(ex=>
+        `${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}`
+      )
+      .join("\n");
+
 }
 
 function copyLastWorkout(){
-  const t = document.getElementById("copyText");
+
+  const t =
+    document.getElementById("copyText");
+
   t.select();
+
   document.execCommand("copy");
+
   statusText("前回実績をコピーしました");
+
 }
 
 function calcVolume(ex){
+
   if(parts[ex.name]==="cardio") return 0;
-  return Number(ex.weight) * Number(ex.reps) * Number(ex.sets);
+
+  return Number(ex.weight) *
+    Number(ex.reps) *
+    Number(ex.sets);
+
 }
 
 function setVolumeRange(r){
+
   volumeRange = r;
 
   ["today","week","month","all"].forEach(x=>{
-    document.getElementById("range-"+x).classList.toggle("active", x===r);
+
+    document
+      .getElementById("range-"+x)
+      .classList.toggle("active", x===r);
+
   });
 
   renderVolume();
+
 }
 
 function getVolumePeriod(){
+
   const now = new Date();
 
   if(volumeRange==="today"){
+
     const selected = getSelectedDateKey();
-    const date = selected ? dateKeyToDate(selected) : now;
-    return {start:date, end:date, label:`対象期間：${formatDateObj(date)}`};
+
+    const date =
+      selected ? dateKeyToDate(selected) : now;
+
+    return {
+      start:date,
+      end:date,
+      label:`対象期間：${formatDateObj(date)}`
+    };
   }
 
   if(volumeRange==="week"){
-    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const end =
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+      );
+
     const start = new Date(end);
+
     start.setDate(end.getDate()-6);
-    return {start, end, label:`対象期間：${formatDateObj(start)}〜${formatDateObj(end)}`};
+
+    return {
+      start,
+      end,
+      label:`対象期間：${formatDateObj(start)}〜${formatDateObj(end)}`
+    };
   }
 
   if(volumeRange==="month"){
-    const start = new Date(now.getFullYear(), now.getMonth(), 1);
-    const end = new Date(now.getFullYear(), now.getMonth()+1, 0);
-    return {start, end, label:`対象期間：${formatDateObj(start)}〜${formatDateObj(end)}`};
+
+    const start =
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1
+      );
+
+    const end =
+      new Date(
+        now.getFullYear(),
+        now.getMonth()+1,
+        0
+      );
+
+    return {
+      start,
+      end,
+      label:`対象期間：${formatDateObj(start)}〜${formatDateObj(end)}`
+    };
   }
 
   if(workouts.length){
+
     const sorted = getSortedAsc();
-    const start = dateKeyToDate(sorted[0].date);
-    const end = dateKeyToDate(sorted[sorted.length-1].date);
-    return {start, end, label:`対象期間：${formatDateObj(start)}〜${formatDateObj(end)}`};
+
+    const start =
+      dateKeyToDate(sorted[0].date);
+
+    const end =
+      dateKeyToDate(sorted[sorted.length-1].date);
+
+    return {
+      start,
+      end,
+      label:`対象期間：${formatDateObj(start)}〜${formatDateObj(end)}`
+    };
   }
 
-  return {start:null, end:null, label:"対象期間：-"};
+  return {
+    start:null,
+    end:null,
+    label:"対象期間：-"
+  };
+
 }
 
 function renderVolume(){
-  const area = document.getElementById("volumeArea");
-  const periodArea = document.getElementById("volumePeriod");
+
+  const area =
+    document.getElementById("volumeArea");
+
+  const periodArea =
+    document.getElementById("volumePeriod");
+
   const period = getVolumePeriod();
 
   periodArea.textContent = period.label;
@@ -1030,268 +1809,509 @@ function renderVolume(){
   let filtered = [...workouts];
 
   if(period.start && period.end){
+
     filtered = workouts.filter(w=>{
+
       const d = dateKeyToDate(w.date);
+
       return d >= period.start && d <= period.end;
+
     });
+
   }
 
   const totals = {};
 
   filtered.forEach(w=>{
+
     w.exercises.forEach(ex=>{
+
       const v = calcVolume(ex);
-      if(!totals[ex.name]) totals[ex.name] = 0;
+
+      if(!totals[ex.name]){
+        totals[ex.name] = 0;
+      }
+
       totals[ex.name] += v;
+
     });
+
   });
 
-  const entries = Object.entries(totals)
-    .filter(([name,v])=>v>0)
-    .sort((a,b)=>b[1]-a[1]);
+  const entries =
+    Object.entries(totals)
+      .filter(([name,v])=>v>0)
+      .sort((a,b)=>b[1]-a[1]);
 
   if(entries.length===0){
-    area.innerHTML = "<p>まだデータがありません。</p>";
+
+    area.innerHTML =
+      "<p>まだデータがありません。</p>";
+
     return;
   }
 
-  const totalSum = entries.reduce((s,e)=>s+e[1],0);
+  const totalSum =
+    entries.reduce((s,e)=>s+e[1],0);
 
   area.innerHTML =
+
     entries.map(([name,v])=>`
       <div class="volume-line">
         <span>${badge(name)}${name}</span>
         <strong>${Math.round(v)}</strong>
       </div>
-    `).join("")+
-    `<div class="volume-line"><strong>総合計</strong><strong>${Math.round(totalSum)}</strong></div>`;
+    `).join("")
+
+    +
+
+    `<div class="volume-line">
+      <strong>総合計</strong>
+      <strong>${Math.round(totalSum)}</strong>
+    </div>`;
+
 }
 
 function setTab(tab, rerender=true){
+
   currentTab = tab;
 
-  ["all","chest","shoulder","back","leg","core","cardio"].forEach(x=>{
-    const b = document.getElementById("tab-"+x);
-    if(b) b.classList.toggle("active", x===tab);
+  [
+    "all",
+    "chest",
+    "shoulder",
+    "back",
+    "leg",
+    "core",
+    "cardio"
+  ].forEach(x=>{
+
+    const b =
+      document.getElementById("tab-"+x);
+
+    if(b){
+      b.classList.toggle("active", x===tab);
+    }
+
   });
 
-  if(rerender) renderHistory();
+  if(rerender){
+    renderHistory();
+  }
+
 }
 
 function renderHistory(){
-  const area = document.getElementById("historyArea");
+
+  const area =
+    document.getElementById("historyArea");
 
   if(!workouts.length){
-    area.innerHTML = "<p>まだ履歴がありません。</p>";
+
+    area.innerHTML =
+      "<p>まだ履歴がありません。</p>";
+
     return;
   }
 
-  area.innerHTML = getSortedDesc().map((w)=>{
-    const original = workouts.findIndex(item=>item.date===w.date);
-    const filtered = w.exercises.filter(ex=>currentTab==="all" || parts[ex.name]===currentTab);
+  area.innerHTML =
+    getSortedDesc()
+      .map((w)=>{
 
-    if(!filtered.length) return "";
+        const original =
+          workouts.findIndex(item=>item.date===w.date);
 
-    return `
-      <div class="history">
-        <div class="history-head" onclick="toggleHistoryByDate('${w.date}')">${w.date}</div>
-        <div class="history-body" id="history-${w.date.replace('/','-')}">
-          ${filtered.map(ex=>`
-            <div class="line">
-              <span>${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span>
+        const filtered =
+          w.exercises.filter(ex=>
+            currentTab==="all" ||
+            parts[ex.name]===currentTab
+          );
+
+        if(!filtered.length) return "";
+
+        return `
+          <div class="history">
+
+            <div
+              class="history-head"
+              onclick="toggleHistoryByDate('${w.date}')"
+            >
+              ${w.date}
             </div>
-          `).join("")}
-          <button class="save" onclick="copyWorkoutToPlan('${w.date}')">今日の予定へ入力</button>
-          <button class="danger" onclick="deleteWorkout(${original})">この日の実績を削除</button>
-        </div>
-      </div>
-    `;
-  }).join("");
+
+            <div
+              class="history-body"
+              id="history-${w.date.replace('/','-')}"
+            >
+
+              ${filtered.map(ex=>`
+                <div class="line">
+                  <span>
+                    ${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}
+                  </span>
+                </div>
+              `).join("")}
+
+              <button
+                class="save"
+                onclick="copyWorkoutToPlan('${w.date}')"
+              >
+                今日の予定へ入力
+              </button>
+
+              <button
+                class="danger"
+                onclick="deleteWorkout(${original})"
+              >
+                この日の実績を削除
+              </button>
+
+            </div>
+          </div>
+        `;
+
+      })
+      .join("");
+
 }
 
 function toggleHistoryByDate(date){
-  document.getElementById("history-"+date.replace('/','-')).classList.toggle("open");
+
+  document
+    .getElementById("history-"+date.replace('/','-'))
+    .classList.toggle("open");
+
 }
 
 function deleteWorkout(i){
+
   if(!confirm("削除しますか？")) return;
 
   workouts.splice(i,1);
+
   sortWorkouts();
-  localStorage.setItem("workouts", JSON.stringify(workouts));
+
+  localStorage.setItem(
+    "workouts",
+    JSON.stringify(workouts)
+  );
 
   render();
+
   statusText("実績を削除しました");
+
 }
 
 function renderGraphSelect(){
-  const names = [...new Set(workouts.flatMap(w=>w.exercises.map(ex=>ex.name)))];
-  const sel = document.getElementById("graphExercise");
+
+  const names =
+    [...new Set(
+      workouts.flatMap(w=>
+        w.exercises.map(ex=>ex.name)
+      )
+    )];
+
+  const sel =
+    document.getElementById("graphExercise");
+
   const old = sel.value;
 
-  sel.innerHTML = names.map(n=>`<option>${n}</option>`).join("");
+  sel.innerHTML =
+    names.map(n=>`<option>${n}</option>`).join("");
 
   if(names.includes(old)){
     sel.value = old;
   }
+
 }
 
 function drawGraph(){
-  const canvas = document.getElementById("graph");
-  const ctx = canvas.getContext("2d");
+
+  const canvas =
+    document.getElementById("graph");
+
+  const ctx =
+    canvas.getContext("2d");
+
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  const name = document.getElementById("graphExercise").value;
+  const name =
+    document.getElementById("graphExercise").value;
+
   if(!name) return;
 
-  const data = getSortedAsc().map(w=>{
-    const xs = w.exercises.filter(ex=>ex.name===name);
-    if(!xs.length) return null;
+  const data =
+    getSortedAsc()
+      .map(w=>{
 
-    return {
-      date:w.date,
-      value:Math.max(...xs.map(ex=>Number(ex.weight)))
-    };
-  }).filter(Boolean);
+        const xs =
+          w.exercises.filter(ex=>ex.name===name);
+
+        if(!xs.length) return null;
+
+        return {
+          date:w.date,
+          value:Math.max(
+            ...xs.map(ex=>Number(ex.weight))
+          )
+        };
+
+      })
+      .filter(Boolean);
 
   if(!data.length) return;
 
-  const max = Math.max(...data.map(d=>d.value));
-  const min = Math.min(...data.map(d=>d.value));
+  const max =
+    Math.max(...data.map(d=>d.value));
+
+  const min =
+    Math.min(...data.map(d=>d.value));
+
   const range = max-min || 1;
 
   ctx.font = "14px sans-serif";
-  ctx.fillText(name+" 最大"+metricLabel(name)+"の推移",20,24);
+
+  ctx.fillText(
+    name+" 最大"+metricLabel(name)+"の推移",
+    20,
+    24
+  );
 
   ctx.beginPath();
 
   data.forEach((d,i)=>{
-    const x = 40 + i * (620 / Math.max(data.length-1,1));
-    const y = 220 - ((d.value-min)/range)*150;
 
-    if(i===0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
+    const x =
+      40 + i * (620 / Math.max(data.length-1,1));
+
+    const y =
+      220 - ((d.value-min)/range)*150;
+
+    if(i===0){
+      ctx.moveTo(x,y);
+    }else{
+      ctx.lineTo(x,y);
+    }
 
     ctx.fillText(d.value,x-8,y-8);
+
     ctx.fillText(d.date,x-14,245);
+
   });
 
   ctx.stroke();
 
   data.forEach((d,i)=>{
-    const x = 40 + i * (620 / Math.max(data.length-1,1));
-    const y = 220 - ((d.value-min)/range)*150;
+
+    const x =
+      40 + i * (620 / Math.max(data.length-1,1));
+
+    const y =
+      220 - ((d.value-min)/range)*150;
 
     ctx.beginPath();
+
     ctx.arc(x,y,4,0,Math.PI*2);
+
     ctx.fill();
+
   });
+
 }
 
 function drawBodyGraph(){
-  const canvas = document.getElementById("bodyGraph");
-  const ctx = canvas.getContext("2d");
+
+  const canvas =
+    document.getElementById("bodyGraph");
+
+  const ctx =
+    canvas.getContext("2d");
+
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  const metric = document.getElementById("bodyGraphMetric").value;
+  const metric =
+    document.getElementById("bodyGraphMetric").value;
+
   const labels = {
     weight:"体重",
     fat:"体脂肪",
     muscle:"筋肉量"
   };
+
   const units = {
     weight:"kg",
     fat:"%",
     muscle:"kg"
   };
 
-  const data = getBodySortedAsc()
-    .map(r=>({
-      date:r.date,
-      value:Number(r[metric])
-    }))
-    .filter(d=>!isNaN(d.value) && d.value > 0);
+  const data =
+    getBodySortedAsc()
+      .map(r=>({
+        date:r.date,
+        value:Number(r[metric])
+      }))
+      .filter(d=>!isNaN(d.value) && d.value > 0);
 
   if(!data.length){
+
     ctx.font = "14px sans-serif";
-    ctx.fillText("身体記録がまだありません",20,24);
+
+    ctx.fillText(
+      "身体記録がまだありません",
+      20,
+      24
+    );
+
     return;
   }
 
-  const max = Math.max(...data.map(d=>d.value));
-  const min = Math.min(...data.map(d=>d.value));
+  const max =
+    Math.max(...data.map(d=>d.value));
+
+  const min =
+    Math.min(...data.map(d=>d.value));
+
   const range = max-min || 1;
 
   ctx.font = "14px sans-serif";
-  ctx.fillText(labels[metric]+"の推移",20,24);
+
+  ctx.fillText(
+    labels[metric]+"の推移",
+    20,
+    24
+  );
 
   ctx.beginPath();
 
   data.forEach((d,i)=>{
-    const x = 40 + i * (620 / Math.max(data.length-1,1));
-    const y = 220 - ((d.value-min)/range)*150;
 
-    if(i===0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
+    const x =
+      40 + i * (620 / Math.max(data.length-1,1));
 
-    ctx.fillText(d.value+units[metric],x-18,y-8);
-    ctx.fillText(d.date,x-14,245);
+    const y =
+      220 - ((d.value-min)/range)*150;
+
+    if(i===0){
+      ctx.moveTo(x,y);
+    }else{
+      ctx.lineTo(x,y);
+    }
+
+    ctx.fillText(
+      d.value+units[metric],
+      x-18,
+      y-8
+    );
+
+    ctx.fillText(
+      d.date,
+      x-14,
+      245
+    );
+
   });
 
   ctx.stroke();
 
   data.forEach((d,i)=>{
-    const x = 40 + i * (620 / Math.max(data.length-1,1));
-    const y = 220 - ((d.value-min)/range)*150;
+
+    const x =
+      40 + i * (620 / Math.max(data.length-1,1));
+
+    const y =
+      220 - ((d.value-min)/range)*150;
 
     ctx.beginPath();
+
     ctx.arc(x,y,4,0,Math.PI*2);
+
     ctx.fill();
+
   });
+
 }
 
 function createBackup(){
+
   const data = {
     workouts,
     bodyRecords,
     plan:localStorage.getItem("plan") || ""
   };
 
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  document.getElementById("backupArea").value = "WT-BACKUP:"+encoded;
-  document.getElementById("backupTime").innerHTML = "最終バックアップ："+new Date().toLocaleString();
+  const encoded =
+    btoa(
+      unescape(
+        encodeURIComponent(
+          JSON.stringify(data)
+        )
+      )
+    );
+
+  document.getElementById("backupArea").value =
+    "WT-BACKUP:"+encoded;
+
+  const now = new Date();
+
+  const fileName =
+    `WorkoutTracker_Backup_${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}_${String(now.getHours()).padStart(2,"0")}-${String(now.getMinutes()).padStart(2,"0")}`;
+
+  document.getElementById("backupTime").innerHTML =
+    `バックアップ名：${fileName}`;
 
   statusText("バックアップを作成しました");
+
 }
 
 function copyBackup(){
-  const area = document.getElementById("backupArea");
+
+  const area =
+    document.getElementById("backupArea");
+
   area.select();
+
   document.execCommand("copy");
 
   statusText("バックアップをコピーしました");
+
 }
 
 async function shareBackup(){
-  const text = document.getElementById("backupArea").value;
+
+  const text =
+    document.getElementById("backupArea").value;
 
   if(!text){
     alert("先にバックアップを作成してください");
     return;
   }
 
+  const now = new Date();
+
+  const fileName =
+    `WorkoutTracker_Backup_${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}_${String(now.getHours()).padStart(2,"0")}-${String(now.getMinutes()).padStart(2,"0")}`;
+
   if(navigator.share){
+
     await navigator.share({
-      title:"Workout Tracker Backup",
+      title:fileName,
       text
     }).catch(()=>{});
+
   }else{
+
     alert("この端末では共有に対応していません");
+
   }
+
 }
 
 function restoreBackup(){
-  const text = document.getElementById("backupArea").value.trim();
+
+  const text =
+    document.getElementById("backupArea")
+      .value
+      .trim();
 
   if(!text.startsWith("WT-BACKUP:")){
     alert("バックアップ文字列が正しくありません");
@@ -1299,7 +2319,16 @@ function restoreBackup(){
   }
 
   try{
-    const decoded = decodeURIComponent(escape(atob(text.replace("WT-BACKUP:",""))));
+
+    const decoded =
+      decodeURIComponent(
+        escape(
+          atob(
+            text.replace("WT-BACKUP:","")
+          )
+        )
+      );
+
     const data = JSON.parse(decoded);
 
     workouts = data.workouts || [];
@@ -1308,43 +2337,65 @@ function restoreBackup(){
     normalizeWorkouts();
     normalizeBodyRecords();
 
-    localStorage.setItem("workouts", JSON.stringify(workouts));
-    localStorage.setItem("bodyRecords", JSON.stringify(bodyRecords));
-    localStorage.setItem("plan", data.plan || "");
+    localStorage.setItem(
+      "workouts",
+      JSON.stringify(workouts)
+    );
+
+    localStorage.setItem(
+      "bodyRecords",
+      JSON.stringify(bodyRecords)
+    );
+
+    localStorage.setItem(
+      "plan",
+      data.plan || ""
+    );
 
     render();
 
     statusText("バックアップを復元しました");
+
   }catch(e){
+
     alert("復元に失敗しました");
+
   }
+
 }
 
 function clearAll(){
+
   if(!confirm("すべて削除しますか？")) return;
 
   workouts = [];
   bodyRecords = [];
   current = [];
+
   editingIndex = -1;
 
   localStorage.removeItem("workouts");
   localStorage.removeItem("bodyRecords");
   localStorage.removeItem("plan");
 
-  document.getElementById("addExerciseBtn").textContent = "実績に追加";
+  document.getElementById("addExerciseBtn").textContent =
+    "実績に追加";
 
   render();
 
   statusText("すべて削除しました");
+
 }
 
 function escapeHtml(text){
+
   return String(text)
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
     .replaceAll(">","&gt;");
+
 }
+
 </script>
 </body>
 </html>
