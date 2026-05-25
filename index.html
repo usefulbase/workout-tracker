@@ -25,6 +25,7 @@ button:active{transform:scale(.98)}
 .status{background:#ecfeff;color:#155e75;padding:12px;border-radius:12px;margin-bottom:16px;font-weight:bold}
 .memo{white-space:pre-wrap;background:var(--soft);padding:12px;border-radius:12px;margin-top:12px;line-height:1.8}
 .line{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:10px 0}
+.line-actions{display:flex;gap:6px;flex-shrink:0}
 .small{width:auto;padding:7px 10px;font-size:12px}
 .btn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
 .btn-grid button{margin-top:0;background:#e5e7eb;color:#111827}
@@ -41,7 +42,7 @@ button:active{transform:scale(.98)}
 .history-head{background:#f1f5f9;padding:12px;font-weight:bold}
 .history-body{padding:12px;display:none}.open{display:block}
 .badge{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;margin-right:6px;color:white}
-.chest{background:#ef4444}.back{background:#3b82f6}.leg{background:#22c55e}.core{background:#a855f7}.cardio{background:#f97316}.other{background:#64748b}
+.chest{background:#ef4444}.shoulder{background:#14b8a6}.back{background:#3b82f6}.leg{background:#22c55e}.core{background:#a855f7}.cardio{background:#f97316}.other{background:#64748b}
 canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;margin-top:10px}
 .volume-line{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0}
 .period-box{background:#f1f5f9;border-radius:12px;padding:12px;margin:8px 0 12px;font-weight:bold;color:#334155}
@@ -115,7 +116,7 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 <button onclick="moveNext()" class="main wide">次へ</button>
 </div>
 
-<button onclick="addExercise()">実績に追加</button>
+<button id="addExerciseBtn" onclick="addExercise()">実績に追加</button>
 <div id="currentArea"></div>
 <button class="save" onclick="saveWorkout()">今日の実績を保存</button>
 </section>
@@ -142,6 +143,7 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 <div class="tabs">
 <button onclick="setTab('all')" id="tab-all">全部</button>
 <button onclick="setTab('chest')" id="tab-chest">胸</button>
+<button onclick="setTab('shoulder')" id="tab-shoulder">肩</button>
 <button onclick="setTab('back')" id="tab-back">背中</button>
 <button onclick="setTab('leg')" id="tab-leg">脚</button>
 <button onclick="setTab('core')" id="tab-core">腹</button>
@@ -246,17 +248,20 @@ canvas{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;m
 <script>
 let workouts = JSON.parse(localStorage.getItem("workouts") || "[]");
 let bodyRecords = JSON.parse(localStorage.getItem("bodyRecords") || "[]");
+
 let current = [];
 let selectedExercise = "レッグプレス";
 let currentTab = "all";
 let activeInput = "weightInput";
 let volumeRange = "all";
+let editingIndex = -1;
 
 const exercises = [
 "トレッドミル",
 "バイク",
 "レッグプレス",
 "チェストプレス",
+"ショルダープレス",
 "ラットプルダウン",
 "アブダクション",
 "アダクション",
@@ -266,6 +271,7 @@ const exercises = [
 
 const parts = {
 "チェストプレス":"chest",
+"ショルダープレス":"shoulder",
 "ラットプルダウン":"back",
 "レッグプレス":"leg",
 "アブダクション":"leg",
@@ -280,12 +286,15 @@ document.addEventListener("DOMContentLoaded",()=>{
   normalizeBodyRecords();
 
   const today = new Date().toISOString().slice(0,10);
+
   document.getElementById("dateInput").value = today;
   document.getElementById("bodyDateInput").value = today;
 
   makeExerciseButtons();
   setActiveInput("weightInput");
+
   statusText("アプリを読み込みました");
+
   render();
 });
 
@@ -299,32 +308,51 @@ function toggleCollapse(id){
 
 function badge(name){
   const p = parts[name] || "other";
-  const label = {chest:"胸",back:"背中",leg:"脚",core:"腹",cardio:"有酸素",other:"他"}[p];
+
+  const label = {
+    chest:"胸",
+    shoulder:"肩",
+    back:"背中",
+    leg:"脚",
+    core:"腹",
+    cardio:"有酸素",
+    other:"他"
+  }[p];
+
   return `<span class="badge ${p}">${label}</span>`;
 }
 
 function getSelectedDateKey(){
   const value = document.getElementById("dateInput").value;
+
   if(!value) return "";
+
   const [y,m,d] = value.split("-").map(Number);
+
   return `${m}/${d}`;
 }
 
 function getBodyDateKey(){
   const value = document.getElementById("bodyDateInput").value;
+
   if(!value) return "";
+
   const [y,m,d] = value.split("-").map(Number);
+
   return `${m}/${d}`;
 }
 
 function dateToNumber(dateText){
   const [m,d] = String(dateText).split("/").map(Number);
+
   return (m || 0) * 100 + (d || 0);
 }
 
 function dateKeyToDate(dateText){
   const now = new Date();
+
   const [m,d] = String(dateText).split("/").map(Number);
+
   return new Date(now.getFullYear(), (m || 1)-1, d || 1);
 }
 
@@ -333,51 +361,90 @@ function formatDateObj(date){
 }
 
 function sortWorkouts(){
-  workouts.sort((a,b)=>dateToNumber(a.date)-dateToNumber(b.date));
+  workouts.sort((a,b)=>
+    dateToNumber(a.date)-dateToNumber(b.date)
+  );
 }
 
 function sortBodyRecords(){
-  bodyRecords.sort((a,b)=>dateToNumber(a.date)-dateToNumber(b.date));
+  bodyRecords.sort((a,b)=>
+    dateToNumber(a.date)-dateToNumber(b.date)
+  );
 }
 
 function getLatestWorkout(){
   if(!workouts.length) return null;
-  return [...workouts].sort((a,b)=>dateToNumber(a.date)-dateToNumber(b.date)).at(-1);
+
+  return [...workouts]
+    .sort((a,b)=>
+      dateToNumber(a.date)-dateToNumber(b.date)
+    )
+    .at(-1);
 }
 
 function getSortedAsc(){
-  return [...workouts].sort((a,b)=>dateToNumber(a.date)-dateToNumber(b.date));
+  return [...workouts]
+    .sort((a,b)=>
+      dateToNumber(a.date)-dateToNumber(b.date)
+    );
 }
 
 function getSortedDesc(){
-  return [...workouts].sort((a,b)=>dateToNumber(b.date)-dateToNumber(a.date));
+  return [...workouts]
+    .sort((a,b)=>
+      dateToNumber(b.date)-dateToNumber(a.date)
+    );
 }
 
 function getBodySortedAsc(){
-  return [...bodyRecords].sort((a,b)=>dateToNumber(a.date)-dateToNumber(b.date));
+  return [...bodyRecords]
+    .sort((a,b)=>
+      dateToNumber(a.date)-dateToNumber(b.date)
+    );
 }
 
 function getBodySortedDesc(){
-  return [...bodyRecords].sort((a,b)=>dateToNumber(b.date)-dateToNumber(a.date));
+  return [...bodyRecords]
+    .sort((a,b)=>
+      dateToNumber(b.date)-dateToNumber(a.date)
+    );
 }
 
 function normalizeWorkouts(){
+
   const merged = {};
+
   workouts.forEach(w=>{
+
     if(!merged[w.date]){
-      merged[w.date] = {date:w.date, exercises:[]};
+      merged[w.date] = {
+        date:w.date,
+        exercises:[]
+      };
     }
-    merged[w.date].exercises = merged[w.date].exercises.concat(w.exercises || []);
+
+    merged[w.date].exercises =
+      merged[w.date].exercises.concat(w.exercises || []);
   });
+
   workouts = Object.values(merged);
+
   sortWorkouts();
-  localStorage.setItem("workouts", JSON.stringify(workouts));
+
+  localStorage.setItem(
+    "workouts",
+    JSON.stringify(workouts)
+  );
 }
 
 function normalizeBodyRecords(){
+
   const merged = {};
+
   bodyRecords.forEach(r=>{
+
     if(!r.date) return;
+
     merged[r.date] = {
       date:r.date,
       weight:r.weight || "",
@@ -385,42 +452,72 @@ function normalizeBodyRecords(){
       muscle:r.muscle || ""
     };
   });
+
   bodyRecords = Object.values(merged);
+
   sortBodyRecords();
-  localStorage.setItem("bodyRecords", JSON.stringify(bodyRecords));
+
+  localStorage.setItem(
+    "bodyRecords",
+    JSON.stringify(bodyRecords)
+  );
 }
 
 function makeExerciseButtons(){
-  const area = document.getElementById("exerciseButtons");
-  area.innerHTML = exercises.map(x =>
-    `<button id="ex-${x}" onclick="selectExercise('${x}')">${x}</button>`
-  ).join("");
+
+  const area =
+    document.getElementById("exerciseButtons");
+
+  area.innerHTML =
+    exercises.map(x=>
+      `<button id="ex-${x}" onclick="selectExercise('${x}')">${x}</button>`
+    ).join("");
+
   selectExercise(selectedExercise);
 }
 
 function selectExercise(name){
+
   selectedExercise = name;
+
   exercises.forEach(x=>{
-    const b = document.getElementById("ex-"+x);
-    if(b) b.classList.toggle("active", x===name);
+
+    const b =
+      document.getElementById("ex-"+x);
+
+    if(b){
+      b.classList.toggle("active", x===name);
+    }
   });
+
   updateLabels();
+
   renderLastForSelected();
 }
 
 function updateLabels(){
-  const cardio = selectedExercise==="トレッドミル" || selectedExercise==="バイク";
-  const abBench = selectedExercise==="アブベンチ";
+
+  const cardio =
+    selectedExercise==="トレッドミル" ||
+    selectedExercise==="バイク";
+
+  const abBench =
+    selectedExercise==="アブベンチ";
 
   if(cardio){
+
     document.getElementById("labelWeight").textContent = "負荷・傾斜";
     document.getElementById("labelReps").textContent = "速度";
     document.getElementById("labelSets").textContent = "分";
-  }else if(abBench){
+  }
+  else if(abBench){
+
     document.getElementById("labelWeight").textContent = "負荷";
     document.getElementById("labelReps").textContent = "回数";
     document.getElementById("labelSets").textContent = "セット";
-  }else{
+  }
+  else{
+
     document.getElementById("labelWeight").textContent = "重量";
     document.getElementById("labelReps").textContent = "回数";
     document.getElementById("labelSets").textContent = "セット";
@@ -428,27 +525,51 @@ function updateLabels(){
 }
 
 function metricLabel(name){
-  if(name==="アブベンチ") return "負荷";
-  if(name==="トレッドミル" || name==="バイク") return "負荷・傾斜";
+
+  if(name==="アブベンチ"){
+    return "負荷";
+  }
+
+  if(
+    name==="トレッドミル" ||
+    name==="バイク"
+  ){
+    return "負荷・傾斜";
+  }
+
   return "重量";
 }
 
 function setActiveInput(id){
+
   activeInput = id;
-  ["weightInput","repsInput","setsInput"].forEach(x=>{
-    document.getElementById(x).classList.toggle("active", x===id);
-  });
+
+  ["weightInput","repsInput","setsInput"]
+    .forEach(x=>{
+
+      document
+        .getElementById(x)
+        .classList.toggle("active", x===id);
+    });
 }
 
 function keyInput(v){
-  const input = document.getElementById(activeInput);
+
+  const input =
+    document.getElementById(activeInput);
+
   if(v==="." && input.value.includes(".")) return;
+
   input.value += v;
 }
 
 function keyBack(){
-  const input = document.getElementById(activeInput);
-  input.value = input.value.slice(0,-1);
+
+  const input =
+    document.getElementById(activeInput);
+
+  input.value =
+    input.value.slice(0,-1);
 }
 
 function keyClear(){
@@ -456,74 +577,179 @@ function keyClear(){
 }
 
 function moveNext(){
-  if(activeInput==="weightInput") setActiveInput("repsInput");
-  else if(activeInput==="repsInput") setActiveInput("setsInput");
-  else setActiveInput("weightInput");
+
+  if(activeInput==="weightInput"){
+    setActiveInput("repsInput");
+  }
+  else if(activeInput==="repsInput"){
+    setActiveInput("setsInput");
+  }
+  else{
+    setActiveInput("weightInput");
+  }
 }
 
 function savePlan(){
-  const text = document.getElementById("planInput").value.trim();
+
+  const text =
+    document.getElementById("planInput")
+      .value
+      .trim();
+
   if(!text){
     alert("予定メモを入力してください");
     return;
   }
+
   localStorage.setItem("plan", text);
+
   document.getElementById("planInput").value = "";
+
   statusText("予定メモを保存しました");
+
   render();
 }
 
 function planToCurrent(){
-  const text = localStorage.getItem("plan") || "";
+
+  const text =
+    localStorage.getItem("plan") || "";
+
   if(!text){
     alert("予定メモがありません");
     return;
   }
+
   const parsed = parseLines(text);
+
   if(parsed.length===0){
     alert("読み取れる予定がありません");
     return;
   }
+
   current = current.concat(parsed);
+
   renderCurrent();
+
   statusText("予定を実績入力へ追加しました");
 }
 
 function parseLines(text){
+
   return text.split("\n")
     .map(s=>s.trim())
     .filter(Boolean)
     .map(line=>{
-      const m = line.match(/^(.+?)(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)$/);
+
+      const m = line.match(
+        /^(.+?)(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)$/
+      );
+
       if(!m) return null;
-      return {name:m[1].trim(), weight:m[2], reps:m[3], sets:m[4]};
+
+      return {
+        name:m[1].trim(),
+        weight:m[2],
+        reps:m[3],
+        sets:m[4]
+      };
     })
     .filter(Boolean);
 }
 
 function addExercise(){
-  let name = selectedExercise;
-  const custom = document.getElementById("customName").value.trim();
-  if(name==="その他" && custom) name = custom;
 
-  const weight = document.getElementById("weightInput").value;
-  const reps = document.getElementById("repsInput").value;
-  const sets = document.getElementById("setsInput").value;
+  let name = selectedExercise;
+
+  const custom =
+    document.getElementById("customName")
+      .value
+      .trim();
+
+  if(name==="その他" && custom){
+    name = custom;
+  }
+
+  const weight =
+    document.getElementById("weightInput").value;
+
+  const reps =
+    document.getElementById("repsInput").value;
+
+  const sets =
+    document.getElementById("setsInput").value;
 
   if(!weight || !reps || !sets){
     alert("重量・回数・セットを入力してください");
     return;
   }
 
-  current.push({name, weight, reps, sets});
+  const item = {
+    name,
+    weight,
+    reps,
+    sets
+  };
 
-  ["weightInput","repsInput","setsInput"].forEach(id=>{
-    document.getElementById(id).value = "";
-  });
+  if(editingIndex >= 0){
+
+    current[editingIndex] = item;
+
+    editingIndex = -1;
+
+    document.getElementById("addExerciseBtn").textContent =
+      "実績に追加";
+
+    statusText("実績を修正しました");
+  }
+  else{
+
+    current.push(item);
+
+    statusText("実績に追加しました");
+  }
+
+  ["weightInput","repsInput","setsInput"]
+    .forEach(id=>{
+      document.getElementById(id).value = "";
+    });
+
+  document.getElementById("customName").value = "";
 
   setActiveInput("weightInput");
-  statusText("実績に追加しました");
+
   renderCurrent();
+}
+
+function editCurrent(i){
+
+  const ex = current[i];
+
+  editingIndex = i;
+
+  if(exercises.includes(ex.name)){
+
+    selectExercise(ex.name);
+
+    document.getElementById("customName").value = "";
+  }
+  else{
+
+    selectExercise("その他");
+
+    document.getElementById("customName").value = ex.name;
+  }
+
+  document.getElementById("weightInput").value = ex.weight;
+  document.getElementById("repsInput").value = ex.reps;
+  document.getElementById("setsInput").value = ex.sets;
+
+  document.getElementById("addExerciseBtn").textContent =
+    "修正を反映";
+
+  setActiveInput("weightInput");
+
+  statusText("修正する内容を入力欄に戻しました");
 }
 
 function saveWorkout(){
@@ -545,7 +771,11 @@ function saveWorkout(){
 
   sortWorkouts();
   localStorage.setItem("workouts", JSON.stringify(workouts));
+
   current = [];
+  editingIndex = -1;
+  document.getElementById("addExerciseBtn").textContent = "実績に追加";
+
   render();
 }
 
@@ -590,8 +820,10 @@ function saveBodyRecord(){
 
 function deleteBodyRecord(date){
   if(!confirm("この身体記録を削除しますか？")) return;
+
   bodyRecords = bodyRecords.filter(r=>r.date!==date);
   localStorage.setItem("bodyRecords", JSON.stringify(bodyRecords));
+
   renderBodyRecords();
   drawBodyGraph();
   statusText("身体記録を削除しました");
@@ -632,6 +864,7 @@ function render(){
 
 function renderPlan(){
   const text = localStorage.getItem("plan");
+
   document.getElementById("planArea").innerHTML = text
     ? `<div class="memo">${escapeHtml(text)}</div>`
     : "<p>まだ予定メモはありません。</p>";
@@ -642,7 +875,10 @@ function renderCurrent(){
     ? current.map((ex,i)=>`
       <div class="line">
         <span>${badge(ex.name)}${ex.name} ${ex.weight}×${ex.reps}×${ex.sets}</span>
-        <button class="small danger" onclick="removeCurrent(${i})">削除</button>
+        <div class="line-actions">
+          <button class="small gray" onclick="editCurrent(${i})">修正</button>
+          <button class="small danger" onclick="removeCurrent(${i})">削除</button>
+        </div>
       </div>
     `).join("")
     : "<p>まだ実績が追加されていません。</p>";
@@ -671,6 +907,12 @@ function renderBodyRecords(){
 
 function removeCurrent(i){
   current.splice(i,1);
+
+  if(editingIndex === i){
+    editingIndex = -1;
+    document.getElementById("addExerciseBtn").textContent = "実績に追加";
+  }
+
   renderCurrent();
 }
 
@@ -698,6 +940,7 @@ function renderLastForSelected(){
 
   for(const w of sorted){
     const found = w.exercises.filter(ex=>ex.name===selectedExercise);
+
     if(found.length){
       area.innerHTML =
         `前回の${selectedExercise}：\n`+
@@ -737,9 +980,11 @@ function calcVolume(ex){
 
 function setVolumeRange(r){
   volumeRange = r;
+
   ["today","week","month","all"].forEach(x=>{
     document.getElementById("range-"+x).classList.toggle("active", x===r);
   });
+
   renderVolume();
 }
 
@@ -772,7 +1017,7 @@ function getVolumePeriod(){
     return {start, end, label:`対象期間：${formatDateObj(start)}〜${formatDateObj(end)}`};
   }
 
-  return {start:null, end:null, label:"対象期間：-"};  
+  return {start:null, end:null, label:"対象期間：-"};
 }
 
 function renderVolume(){
@@ -824,10 +1069,12 @@ function renderVolume(){
 
 function setTab(tab, rerender=true){
   currentTab = tab;
-  ["all","chest","back","leg","core","cardio"].forEach(x=>{
+
+  ["all","chest","shoulder","back","leg","core","cardio"].forEach(x=>{
     const b = document.getElementById("tab-"+x);
     if(b) b.classList.toggle("active", x===tab);
   });
+
   if(rerender) renderHistory();
 }
 
@@ -868,9 +1115,11 @@ function toggleHistoryByDate(date){
 
 function deleteWorkout(i){
   if(!confirm("削除しますか？")) return;
+
   workouts.splice(i,1);
   sortWorkouts();
   localStorage.setItem("workouts", JSON.stringify(workouts));
+
   render();
   statusText("実績を削除しました");
 }
@@ -898,6 +1147,7 @@ function drawGraph(){
   const data = getSortedAsc().map(w=>{
     const xs = w.exercises.filter(ex=>ex.name===name);
     if(!xs.length) return null;
+
     return {
       date:w.date,
       value:Math.max(...xs.map(ex=>Number(ex.weight)))
@@ -931,6 +1181,7 @@ function drawGraph(){
   data.forEach((d,i)=>{
     const x = 40 + i * (620 / Math.max(data.length-1,1));
     const y = 220 - ((d.value-min)/range)*150;
+
     ctx.beginPath();
     ctx.arc(x,y,4,0,Math.PI*2);
     ctx.fill();
@@ -992,6 +1243,7 @@ function drawBodyGraph(){
   data.forEach((d,i)=>{
     const x = 40 + i * (620 / Math.max(data.length-1,1));
     const y = 220 - ((d.value-min)/range)*150;
+
     ctx.beginPath();
     ctx.arc(x,y,4,0,Math.PI*2);
     ctx.fill();
@@ -1008,6 +1260,7 @@ function createBackup(){
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   document.getElementById("backupArea").value = "WT-BACKUP:"+encoded;
   document.getElementById("backupTime").innerHTML = "最終バックアップ："+new Date().toLocaleString();
+
   statusText("バックアップを作成しました");
 }
 
@@ -1015,6 +1268,7 @@ function copyBackup(){
   const area = document.getElementById("backupArea");
   area.select();
   document.execCommand("copy");
+
   statusText("バックアップをコピーしました");
 }
 
@@ -1047,6 +1301,7 @@ function restoreBackup(){
   try{
     const decoded = decodeURIComponent(escape(atob(text.replace("WT-BACKUP:",""))));
     const data = JSON.parse(decoded);
+
     workouts = data.workouts || [];
     bodyRecords = data.bodyRecords || [];
 
@@ -1058,6 +1313,7 @@ function restoreBackup(){
     localStorage.setItem("plan", data.plan || "");
 
     render();
+
     statusText("バックアップを復元しました");
   }catch(e){
     alert("復元に失敗しました");
@@ -1070,12 +1326,16 @@ function clearAll(){
   workouts = [];
   bodyRecords = [];
   current = [];
+  editingIndex = -1;
 
   localStorage.removeItem("workouts");
   localStorage.removeItem("bodyRecords");
   localStorage.removeItem("plan");
 
+  document.getElementById("addExerciseBtn").textContent = "実績に追加";
+
   render();
+
   statusText("すべて削除しました");
 }
 
